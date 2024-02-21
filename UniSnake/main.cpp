@@ -2,11 +2,16 @@
 
 using namespace std;
 
+// https://www.youtube.com/watch?v=7j5yW5QDC2U
+// Water takes 90 seconds to empty
+// Maximum of 5 food on the screen at once
+
 
 int main() {
-	Map* map = new Map(gWindow.getSize());
-	map->setCell({ 0, 0 }, true);
 	gWindow.setFramerateLimit(gFps);  // Set target framerate
+
+	sf::Vector2i playerPos{ gWidth / 2, gHeight / 2};
+	sf::Vector2f playerVel{ 0, 0 };
 
 	while (gWindow.isOpen()) {  // Main loop
 		sf::Event event;  // Fetch & process window events
@@ -16,7 +21,7 @@ int main() {
 		}
 
 		gWindow.clear();   // Remove previous frame
-		map->draw(gWindow);
+
 		gWindow.display();
 	}
 }
