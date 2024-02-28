@@ -11,3 +11,5 @@ unsigned int gFps{ 60 };  // FPS
 sf::RectangleShape gRect;  // Load rect class
 sf::CircleShape gCircle;  // Load circle class
 sf::RenderWindow gWindow(sf::VideoMode(gWidth, gHeight), "Snake");  // Window (screen)
+
+sf::Color Col1{ 0, 255, 0, 255 }, Col2{ 0, 100, 0, 255 };
