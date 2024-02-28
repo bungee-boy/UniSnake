@@ -9,7 +9,25 @@ int main() {
 	gCircle.setRadius(10);
 	gCircle.setOrigin({ gCircle.getRadius(), gCircle.getRadius() });
 
-	snake player1 = snake(5);
+	sf::Texture texture1;
+	if (!texture1.loadFromFile("Apple.png")) {
+		std::cerr << "Failed to load Apple.png" << '\n';
+	}
+	sf::Texture texture2;
+	if (!texture2.loadFromFile("GoldApple.png")) {
+		std::cerr << "Failed to load GoldApple.png" << '\n';
+	}
+
+	gCircle.setTexture(&texture1);
+
+	sf::Sprite apple1;
+	apple1.setTexture(texture1);
+
+	sf::Sprite apple2;
+	apple2.setTexture(texture2);
+	apple2.setPosition({ 0, 32 });
+
+	snake player1 = snake(20);
 
 	bool skipFrame{ false };
 	while (gWindow.isOpen()) {  // Main loop
@@ -21,7 +39,9 @@ int main() {
 
 		player1.update();
 
-		gWindow.clear();   // Remove previous frame
+		gWindow.clear({255, 255, 255, 255});   // Remove previous frame
+		gWindow.draw(apple1);
+		gWindow.draw(apple2);
 		player1.draw(gWindow);
 		gWindow.display();
 	}
