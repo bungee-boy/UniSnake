@@ -1,30 +1,35 @@
 #include "snake.h"
 
-snake::snake(const int length) {
+snake::snake(const sf::Vector2f startPos, const int length) {
 	if (!texture1.loadFromFile("SnakeSegment.png")) {
 		std::cerr << "Failed to load SnakeSegment.png" << '\n';
 	}
 	texture1.setSmooth(true);
+	m_pos = startPos;
 	for (int i{ 0 }; i < length; i++) {
-		addNode(m_vel, 0, &texture1);
+		addNode(m_pos, 0, &texture1);
 	}
-	m_vel.x = gWidth / 2;
+	m_pos.x = startPos.x;
+}
+
+void snake::handleInput(inputActions action) {
+	if (m_updateCount == m_speed) {
+		if (action == inputActions::eP1Left)
+			m_direction -= 10;
+		else if (action == inputActions::eP1Right)
+			m_direction += 10;
+	}
 }
 
 void snake::update() {
 	if (m_updateCount == m_speed) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))  // Player input
-			m_direction -= 10;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			m_direction += 10;
-
 		if (m_direction >= 360)  // Limit the rotation between 0 - 359
 			m_direction -= 360;
 		else if (m_direction < 0)
 			m_direction += 360;
 
-		m_vel.x = std::round(cos(-m_direction * (PI / 180)) * gCircle.getRadius() * 1.5);  // Calculate the head's velocity
-		m_vel.y = -std::round(sin(-m_direction * (PI / 180)) * gCircle.getRadius() * 1.5);
+		m_vel.x = std::round(cos(-m_direction * (PI / 180)) * m_size * 1.5);  // Calculate the head's velocity
+		m_vel.y = -std::round(sin(-m_direction * (PI / 180)) * m_size * 1.5);
 
 		std::cout << m_direction << '\n' << m_vel.x << ' ' << m_vel.y << '\n';
 
@@ -45,19 +50,15 @@ void snake::update() {
 		m_updateCount++;
 }
 
-void snake::draw(sf::RenderWindow& window) {
-	gCircle.setFillColor({ 255, 0, 0, 255 });
-	gCircle.setPosition(m_pos);
-	window.draw(gCircle);
-
+void snake::draw(sf::RenderWindow* window) {
 	m_node* currNode = m_head;
 	while (currNode != nullptr) {  // Draw every node in linked list
-		window.draw(currNode->shape);
+		window->draw(currNode->shape);
 		currNode = currNode->next;
 	}
 }
 
-void snake::addNode(const sf::Vector2f pos, const int direction, const sf::Texture *texture, const bool to_tail) {  // Initialise a node
+void snake::addNode(const sf::Vector2f pos, const float direction, const sf::Texture *texture, const bool to_tail) {  // Initialise a node
 	m_node* newNode = new m_node;  // Create new node
 	newNode->shape.setRadius(m_size);
 	newNode->shape.setOrigin(m_size, m_size);
