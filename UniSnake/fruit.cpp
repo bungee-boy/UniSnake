@@ -1,9 +1,9 @@
 #include "fruit.h"
 
-fruit::fruit(int value, sf::Texture texture, sf::Vector2f pos, collisionType collision) {
+fruit::fruit(int value, sf::Texture* texture, sf::Vector2f pos, collisionType collision) {
 	setCollisionType(collision);
 	m_value = value;
-	m_texture = texture;
+	m_texture = *texture;
 	m_pos = pos;
 	m_sprite = sf::Sprite(m_texture);
 	m_sprite.setTexture(m_texture);
@@ -54,12 +54,13 @@ bool fruit::isColliding(iCollision* other) {
 }
 
 void fruit::collideSnake() {
-	std::cout << "Fruit -> collidedSnake()\n";
 	m_isAlive = false;
+	//std::cout << "Fruit -> collidedSnake()\n";
 }
 
 void fruit::collideFruit(int value) {
-	std::cout << "Fruit -> collidedFruit(" << value << ")\n";
+	m_isAlive = false;
+	//std::cout << "Fruit -> collidedFruit(" << value << ")\n";
 }
 
 void fruit::draw(sf::RenderWindow* window) {

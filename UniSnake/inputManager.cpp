@@ -5,6 +5,10 @@ void inputManager::addInterface(iInput* interface) {
 	m_interfaces.push_back(interface);
 }
 
+void inputManager::removeInterface(iInput* interface) {
+	m_interfaces.erase(std::find(m_interfaces.begin(), m_interfaces.end(), interface));
+}
+
 void inputManager::update() {
 	inputActions action = inputActions::eNone;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))

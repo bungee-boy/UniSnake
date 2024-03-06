@@ -7,6 +7,7 @@ class inputManager
 {
 public:
 	void addInterface(iInput* interface);
+	void removeInterface(iInput* interface);
 	void update();
 private:
 	std::vector<iInput*> m_interfaces;

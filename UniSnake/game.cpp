@@ -1,32 +1,26 @@
 #include "game.h"
 
-void game::begin() {
-	sf::ContextSettings settings;
+game::game() {
+	srand(time(NULL));
+	sf::ContextSettings settings;  // Setup window settings
 	settings.antialiasingLevel = 8;
-	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);
+
+	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
-	sf::Texture texture1;
-	if (!texture1.loadFromFile("Apple.png")) {
+	m_foodTexture1 = new sf::Texture;  // Load textures
+	m_foodTexture2 = new sf::Texture;
+	if (!m_foodTexture1->loadFromFile("Apple.png")) {
 		std::cerr << "Failed to load Apple.png" << '\n';
 	}
-	sf::Texture texture2;
-	if (!texture2.loadFromFile("GoldApple.png")) {
+	if (!m_foodTexture2->loadFromFile("GoldApple.png")) {
 		std::cerr << "Failed to load GoldApple.png" << '\n';
 	}
+}
 
-	drawManager draw = drawManager();
-	inputManager input = inputManager();
-	collisionManager collision = collisionManager();
-
-	snake* player1 = new snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 100);
-	input.addInterface(player1);
-	collision.addInterface(player1);
-	draw.addInterface(player1);
-
-	fruit* apple1 = new fruit(5, texture1, { 150.0f, 150.0f }, collisionType::eCircle);
-	collision.addInterface(apple1);
-	draw.addInterface(apple1);
+void game::begin() {
+	addSnake();
+	addFruit();
 
 	while (m_window->isOpen()) {  // Main loop
 		sf::Event event;  // Fetch & process window events
@@ -35,14 +29,56 @@ void game::begin() {
 				m_window->close();  // Quit if window closed or Esc pressed
 		}
 
-		input.update();  // Check input keys
+		if (m_fruits.size() < 5 && rand() % 100 == 0) {
+			addFruit();
+		}
 
-		player1->update();
+		m_input.update();  // Check input keys
 
-		collision.update();
+		for (int i{ 0 }; i < m_snakes.size(); i++)  // Update snakes
+			m_snakes[i]->update();
+
+		m_collision.update();
+
+		for (int i{ 0 }; i < m_snakes.size(); i++) {
+			if (!m_snakes[i]->m_isAlive)
+				delSnake(m_snakes[i]);
+		}
+		for (int i{ 0 }; i < m_fruits.size(); i++) {  // Check if any fruit have died
+			if (!m_fruits[i]->m_isAlive)
+				delFruit(m_fruits[i]);
+		}
 
 		m_window->clear({ 100, 100, 100, 255 });   // Remove previous frame
-		draw.update(m_window);
+		m_draw.update(m_window);
 		m_window->display();
 	}
+}
+
+void game::addSnake() {
+	snake* tempSnake = new snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 5);
+	m_input.addInterface(tempSnake);
+	m_collision.addInterface(tempSnake);
+	m_draw.addInterface(tempSnake);
+	m_snakes.push_back(tempSnake);
+}
+
+void game::delSnake(snake* obj) {
+	m_input.removeInterface(obj);
+	m_collision.removeInterface(obj);
+	m_draw.removeInterface(obj);
+	m_snakes.erase(std::find(m_snakes.begin(), m_snakes.end(), obj));
+}
+
+void game::addFruit() {
+	fruit* tempFruit = new fruit(10, m_foodTexture1, { static_cast<float>(rand() % m_screenSize.x), static_cast<float>(rand() % m_screenSize.y) }, collisionType::eCircle);
+	m_collision.addInterface(tempFruit);
+	m_draw.addInterface(tempFruit);
+	m_fruits.push_back(tempFruit);
+}
+
+void game::delFruit(fruit* obj) {
+	m_collision.removeInterface(obj);
+	m_draw.removeInterface(obj);
+	m_fruits.erase(std::find(m_fruits.begin(), m_fruits.end(), obj));
 }

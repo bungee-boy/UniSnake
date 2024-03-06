@@ -3,9 +3,9 @@
 const float snake::Pi = 3.14159265359f;
 const float snake::Size = 10.0f;
 const float snake::NodeGap = 1.3f;
-const float snake::TurnSpeed = 2;
-const float snake::TurnMax = 14;
-const float snake::TurnSmoothing = 1;
+const float snake::TurnSpeed = 4;
+const float snake::TurnMax = 15;
+const float snake::TurnSmoothing = 2;
 const int snake::Speed = 3;
 
 snake::m_node* snake::m_node::m_head = nullptr;  // Head of linked list
@@ -73,7 +73,7 @@ snake::snake(const sf::Vector2f startPos, const int length) {  // Constructor
 	m_node::m_texture.setSmooth(true);
 	m_pos = startPos;
 	for (int i{ 0 }; i < length; i++)  // Init linked list
-		addNode(m_pos, m_dir - 180);
+		addNode(m_pos, m_dir);
 }
 
 void snake::handleInput(inputActions action) {
@@ -143,11 +143,25 @@ void snake::collideSnake() {
 }
 
 void snake::collideFruit(int value) {
-	std::cout << "Snake -> collidedFruit(" << value << ")\n";
+	m_addNodes += value;
+	//std::cout << "Snake -> collidedFruit(" << value << ")\n";
 }
 
 void snake::update() {
 	if (m_updateCount == Speed) {
+		m_node* currNode = m_node::m_head;  // Check collision with self
+		while (currNode != nullptr || currNode == m_node::m_tail) {  // Check each node in linked list
+			if (currNode->isColliding(m_node::m_tail)) {
+				m_isAlive = false;
+				break;
+			}
+			currNode = currNode->m_next;
+		}
+
+		if (m_addNodes > 0) {  // Allow snake to grow
+			addNode(m_node::m_head->m_pos, m_node::m_head->m_shape.getRotation(), false);
+			m_addNodes--;
+		}
 
 		m_vel.x = std::roundf(cos((- m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Calculate the head's velocity
 		m_vel.y = -std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
@@ -160,10 +174,9 @@ void snake::update() {
 			m_vel.x = -m_vel.x;  // Invert velocity
 			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
 		}
-
 		// The snake (visually) is reversed in relation to the linked list,
 		//     so that the head is always drawn on top (last)
-		addNode(m_pos, m_dir - 180);  // Add new node to tail
+		addNode(m_pos, m_dir);  // Add new node to tail
 		delNode(false);  // Remove head node
 
 		m_updateCount = 0;

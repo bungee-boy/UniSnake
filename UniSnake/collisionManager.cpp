@@ -14,6 +14,7 @@ void collisionManager::checkCollision(iCollision* current, iCollision* other) {
 			current->collideSnake();
 		}
 		else if (dynamic_cast<fruit*>(other) != nullptr) {
+			static_cast<fruit*>(other)->m_isAlive = false;
 			current->collideFruit(static_cast<fruit*>(other)->getValue());
 		}
 	}
@@ -24,7 +25,7 @@ void collisionManager::update() {
 		for (int other{ 0 }; other < m_interfaces.size(); other++) {
 			if (current != other) {
 				checkCollision(m_interfaces[current], m_interfaces[other]);
-				checkCollision(m_interfaces[other], m_interfaces[current]);
+				//checkCollision(m_interfaces[other], m_interfaces[current]);
 			}
 		}
 	}

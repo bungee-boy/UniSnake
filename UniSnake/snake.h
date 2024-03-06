@@ -7,6 +7,7 @@
 
 class snake : public iInput, public iCollision, public iDraw {
 public:
+	bool m_isAlive{ true };
 	snake(const sf::Vector2f startPos, const int length = 1);
 	void handleInput(inputActions action) override;  // From iInput.h
 	sf::Vector2f getCircleCenter();  // From iCollision.h
@@ -30,6 +31,7 @@ private:
 	float m_dir{ 0 };  // Direction (rotation)
 	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
 	int m_updateCount{ 0 };  // Counter for update
+	unsigned int m_addNodes{ 0 };  // Buffer of nodes to add
 
 	class m_node : public iCollision {  // Node for linked list
 	public:
