@@ -1,35 +1,59 @@
 #pragma once
 
 #include <iostream>
-#include "SFML\Graphics.hpp"
-#include "inputObserver.h"
+#include "iInput.h"
+#include "iCollision.h"
+#include "iDraw.h"
 
-const double PI = 3.14159265359;
-
-class snake : public inputObserver{
+class snake : public iInput, public iCollision, public iDraw {
 public:
 	snake(const sf::Vector2f startPos, const int length = 1);
-	void handleInput(inputActions action) override;  // From input.h
+	void handleInput(inputActions action) override;  // From iInput.h
+	sf::Vector2f getCircleCenter();  // From iCollision.h
+	sf::FloatRect getRect();  // From iCollision.h
+	float getRadius();  // From iCollision.h
+	bool isColliding(iCollision* other) override;  // From iCollision.h
+	void collideSnake();  // From iCollision.h
+	void collideFruit(int value);  // From iCollision.h
 	void update();
-	void draw(sf::RenderWindow* window);
+	void draw(sf::RenderWindow* window) override;  // From iDraw.h
 private:
-	const float m_size{ 10 };
-	sf::Vector2f m_pos{ 0, 0 };  // Current position
-	sf::Vector2f m_vel{ 0, 0 };  // Current velocity
-	float m_direction{ 0 };  // Current direction
-	int m_speed{ 1 };  // Movement speed of the snake (update rate)
-	int m_updateCount{ 0 };  // Counter to update
+	static const float Pi;  // Used for rotation
+	static const float Size;  // Radius of snake's nodes
+	static const float NodeGap;  // Separation between nodes (affects speed!)
+	static const float TurnSpeed;  // Turning speed
+	static const float TurnMax;  // Maximum turning amount
+	static const float TurnSmoothing;  // Turning speed back to 0 (not pressing)
+	static const int Speed;  // Movement speed of the snake (update rate)
+	sf::Vector2f m_pos{ 0, 0 };  // Position
+	sf::Vector2f m_vel{ 0, 0 };  // Velocity
+	float m_dir{ 0 };  // Direction (rotation)
+	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
+	int m_updateCount{ 0 };  // Counter for update
 
-	sf::Texture texture1;
-	struct m_node {  // Node for linked list
-		m_node* next{ nullptr };
-		sf::Vector2f pos{ 0, 0 };
-		sf::CircleShape shape;
+	class m_node : public iCollision {  // Node for linked list
+	public:
+		m_node(sf::Vector2f pos, float direction, snake* parent);
+		sf::Vector2f getCircleCenter();  // From iCollision.h
+		sf::FloatRect getRect();  // From iCollision.h
+		float getRadius();  // From iCollision.h
+		bool isColliding(iCollision* other) override;  // From iCollision.h
+		void collideSnake();  // From iCollision.h
+		void collideFruit(int value);  // From iCollision.h
+		void draw(sf::RenderWindow* window);
+	protected:
+		friend class snake;  // Allow snake to access protected members
+		static sf::Texture m_texture;  // Texture of all nodes
+		static m_node* m_head;  // Head of linked list
+		static m_node* m_tail;  // Tail of linked list
+		m_node* m_next{ nullptr };  // Next node in linked list
+		snake* m_parent{ nullptr };  // Ptr to parent snake (for collision)
+	private:
+		sf::Vector2f m_pos{ 0, 0 };  // Node position
+		sf::CircleShape m_shape;  // Drawable surface
 	};
-	m_node* m_head{ nullptr };  // Head of linked list
-	m_node* m_tail{ nullptr };  // Tail of linked list
 
-	void addNode(const sf::Vector2f pos, const float direction, const sf::Texture *texture, const bool to_tail = true);
+	void addNode(const sf::Vector2f pos, const float direction, const bool to_tail = true);  // Add a new node to linked list
 	void delNode(const bool del_tail = true);  // Delete the tail node
 };
 

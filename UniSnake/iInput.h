@@ -8,8 +8,7 @@ enum class inputActions {
 	eP2Right
 };
 
-class inputObserver
-{
+class iInput {
 public:
 	virtual void handleInput(inputActions action) = 0;
 };

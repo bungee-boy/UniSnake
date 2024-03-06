@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Interface Files">
+      <UniqueIdentifier>{4e47ac5a-1b4b-4f9b-9512-762b2e985454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager Files">
+      <UniqueIdentifier>{29786cf0-7179-4cce-ac1b-0e7990b588bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,11 +27,20 @@
     <ClCompile Include="snake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fruit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inputManager.cpp">
+      <Filter>Manager Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawManager.cpp">
+      <Filter>Manager Files</Filter>
+    </ClCompile>
+    <ClCompile Include="collisionManager.cpp">
+      <Filter>Manager Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -35,14 +50,29 @@
     <ClInclude Include="snake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inputObserver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="game.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fruit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iCollision.h">
+      <Filter>Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iDraw.h">
+      <Filter>Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iInput.h">
+      <Filter>Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inputManager.h">
+      <Filter>Manager Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawManager.h">
+      <Filter>Manager Files</Filter>
+    </ClInclude>
+    <ClInclude Include="collisionManager.h">
+      <Filter>Manager Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

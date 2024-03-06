@@ -1,12 +1,10 @@
 #include "game.h"
 
 void game::begin() {
-	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake");
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 8;
+	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
-
-	m_circle.setFillColor({ 255, 255, 255, 255 });
-	m_circle.setRadius(10);
-	m_circle.setOrigin({ m_circle.getRadius(), m_circle.getRadius() });
 
 	sf::Texture texture1;
 	if (!texture1.loadFromFile("Apple.png")) {
@@ -17,21 +15,19 @@ void game::begin() {
 		std::cerr << "Failed to load GoldApple.png" << '\n';
 	}
 
-	m_circle.setTexture(&texture1);
-
-	sf::Sprite apple1;
-	apple1.setTexture(texture1);
-
-	sf::Sprite apple2;
-	apple2.setTexture(texture2);
-	apple2.setPosition({ 0, 32 });
-
+	drawManager draw = drawManager();
 	inputManager input = inputManager();
-	snake* player1 = new snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 20);
-	input.registerObserver(player1);
+	collisionManager collision = collisionManager();
 
+	snake* player1 = new snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 100);
+	input.addInterface(player1);
+	collision.addInterface(player1);
+	draw.addInterface(player1);
 
-	bool skipFrame{ false };
+	fruit* apple1 = new fruit(5, texture1, { 150.0f, 150.0f }, collisionType::eCircle);
+	collision.addInterface(apple1);
+	draw.addInterface(apple1);
+
 	while (m_window->isOpen()) {  // Main loop
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {
@@ -40,12 +36,13 @@ void game::begin() {
 		}
 
 		input.update();  // Check input keys
+
 		player1->update();
 
-		m_window->clear({ 255, 255, 255, 255 });   // Remove previous frame
-		m_window->draw(apple1);
-		m_window->draw(apple2);
-		player1->draw(m_window);
+		collision.update();
+
+		m_window->clear({ 100, 100, 100, 255 });   // Remove previous frame
+		draw.update(m_window);
 		m_window->display();
 	}
 }

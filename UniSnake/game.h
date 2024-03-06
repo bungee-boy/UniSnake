@@ -2,7 +2,10 @@
 #include <cmath>
 #include <iostream>
 #include "inputManager.h"
+#include "drawManager.h"
+#include "collisionManager.h"
 #include "snake.h"
+#include "fruit.h"
 
 class game
 {

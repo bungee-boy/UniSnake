@@ -130,14 +130,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collisionManager.cpp" />
+    <ClCompile Include="drawManager.cpp" />
+    <ClCompile Include="fruit.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="inputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="snake.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collisionManager.h" />
+    <ClInclude Include="drawManager.h" />
+    <ClInclude Include="fruit.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="inputObserver.h" />
+    <ClInclude Include="iCollision.h" />
+    <ClInclude Include="iDraw.h" />
+    <ClInclude Include="iInput.h" />
     <ClInclude Include="inputManager.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="snake.h" />

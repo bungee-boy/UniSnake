@@ -1,15 +1,14 @@
 #pragma once
-
 #include <vector>
-#include <SFML/Graphics.hpp>
-#include "inputObserver.h"
+#include "SFML\Graphics.hpp"
+#include "iInput.h"
 
 class inputManager
 {
 public:
-	void registerObserver(inputObserver* observer);
+	void addInterface(iInput* interface);
 	void update();
 private:
-	std::vector<inputObserver*> m_observers;
+	std::vector<iInput*> m_interfaces;
 };
 

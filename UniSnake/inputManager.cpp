@@ -1,7 +1,8 @@
 #include "inputManager.h"
+#include <iostream>
 
-void inputManager::registerObserver(inputObserver* observer) {
-	m_observers.push_back(observer);
+void inputManager::addInterface(iInput* interface) {
+	m_interfaces.push_back(interface);
 }
 
 void inputManager::update() {
@@ -11,8 +12,6 @@ void inputManager::update() {
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		action = inputActions::eP1Right;
 
-	if (action != inputActions::eNone) {
-		for (inputObserver* observer : m_observers)
-			observer->handleInput(action);
-	}
+	for (iInput* interface : m_interfaces)
+		interface->handleInput(action);
 }
