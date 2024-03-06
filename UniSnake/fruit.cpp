@@ -1,15 +1,45 @@
-#include "fruit.h"
+#include "Fruit.h"
 
-Fruit::Fruit(int value, sf::Texture* texture, sf::Vector2f pos, CollisionType collision) {
+const std::vector<unsigned int> Fruit::Probabilities{ 4, 3, 2, 1 };  // Probabilities of values
+sf::Texture Fruit::TextureTwo;
+sf::Texture Fruit::TextureThree;
+sf::Texture Fruit::TextureFour;
+sf::Texture Fruit::TextureFive;
+
+Fruit::Fruit(unsigned int value, sf::Vector2f pos, CollisionType collision) {
 	setCollisionType(collision);
 	m_value = value;
-	m_texture = *texture;
+	switch (m_value) {
+	case 2:
+		m_sprite = sf::Sprite(TextureTwo);
+		break;
+	case 3:
+		m_sprite = sf::Sprite(TextureThree);
+		break;
+	case 4:
+		m_sprite = sf::Sprite(TextureFour);
+		break;
+	case 5:
+		m_sprite = sf::Sprite(TextureFive);
+		break;
+	default:
+		std::cerr << "Fruit value is out of range 2->5 ! (m_value: " << m_value << ")\n";
+	}
 	m_pos = pos;
-	m_sprite = sf::Sprite(m_texture);
-	m_sprite.setTexture(m_texture);
 	if (getCollisionType() == CollisionType::eCircle)  // Center circle if fruit is round
 		m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2, m_sprite.getLocalBounds().height / 2);
 	m_sprite.setPosition(m_pos);
+}
+
+void Fruit::loadTextures() {
+	if (!TextureTwo.loadFromFile("textures\\two.png"))  // Textures::two
+		std::cerr << "Failed to load two.png" << '\n';
+	if (!TextureThree.loadFromFile("textures\\three.png"))  // Textures::three
+		std::cerr << "Failed to load three.png" << '\n';
+	if (!TextureFour.loadFromFile("textures\\four.png"))  // Textures::four
+		std::cerr << "Failed to load four.png" << '\n';
+	if (!TextureFive.loadFromFile("textures\\five.png"))  // Textures::five
+		std::cerr << "Failed to load five.png" << '\n';
 }
 
 void Fruit::move(float x, float y) {

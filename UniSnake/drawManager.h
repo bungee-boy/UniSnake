@@ -1,8 +1,7 @@
 #pragma once
-
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "iDraw.h"
+#include "IDraw.h"
 
 class DrawManager
 {

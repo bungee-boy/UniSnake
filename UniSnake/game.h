@@ -1,11 +1,17 @@
 #pragma once
 #include <cmath>
 #include <iostream>
-#include "inputManager.h"
-#include "drawManager.h"
-#include "collisionManager.h"
-#include "snake.h"
-#include "fruit.h"
+#include "InputManager.h"
+#include "DrawManager.h"
+#include "CollisionManager.h"
+#include "Tank.h"
+#include "Snake.h"
+#include "Fruit.h"
+
+enum class GameMode {
+	eClassic,
+	eArcade
+};
 
 class Game
 {
@@ -17,14 +23,15 @@ private:
 	void delSnake(Snake* obj);
 	void addFruit();
 	void delFruit(Fruit* obj);
+	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
 	const sf::Vector2u m_screenSize{ 1000, 1000 };  // Screen size
 	unsigned int m_fps{ 60 };  // FPS
 	sf::RenderWindow* m_window;  // Window (screen)
+	GameMode m_gameMode;  // Game mode
 	DrawManager m_draw;  // Draw manager
 	InputManager m_input;  // Input manager
 	CollisionManager m_collision;  // Collision manager
+	Tank m_tank;  // Tank
 	std::vector<Snake*> m_snakes;  // Vector of snakes
 	std::vector<Fruit*> m_fruits;  // Vector of foods
-	sf::Texture* m_foodTexture1;
-	sf::Texture* m_foodTexture2;
 };

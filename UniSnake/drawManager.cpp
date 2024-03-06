@@ -1,4 +1,4 @@
-#include "drawManager.h"
+#include "DrawManager.h"
 
 void DrawManager::addInterface(IDraw* interface) {
 	m_interfaces.push_back(interface);

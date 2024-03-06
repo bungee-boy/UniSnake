@@ -1,14 +1,16 @@
 #pragma once
 #include <iostream>
-#include "iCollision.h"
-#include "iDraw.h"
+#include "ICollision.h"
+#include "IDraw.h"
 
 class Fruit : public ICollision, public IDraw {
 public:
+	static const std::vector<unsigned int> Probabilities;
 	bool m_isAlive{ true };
-	Fruit(int value, sf::Texture* texture, sf::Vector2f pos, CollisionType collision = CollisionType::eRect);
-	void move(float x = 0, float y = 0);
-	int getValue();
+	Fruit(unsigned int value, sf::Vector2f pos, CollisionType collision = CollisionType::eRect);
+	static void loadTextures();  // Load textures
+	void move(float x = 0, float y = 0);  // Shift the fruit by an amount
+	int getValue();  // Return m_value
 	sf::FloatRect getRect();  // From iCollision.h
 	float getRadius();  // From iCollision.h
 	sf::Vector2f getCircleCenter();  // From iCollision.h
@@ -17,9 +19,12 @@ public:
 	void collideFruit(int value);  // From iCollision.h
 	void draw(sf::RenderWindow* window) override;  // From iDraw.h
 private:
+	static sf::Texture TextureTwo;
+	static sf::Texture TextureThree;
+	static sf::Texture TextureFour;
+	static sf::Texture TextureFive;
 	int m_value{ 0 };
 	sf::Vector2f m_pos{ 0, 0 };
-	sf::Texture m_texture;
 	sf::Sprite m_sprite;
 };
 

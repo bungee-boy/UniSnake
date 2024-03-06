@@ -1,6 +1,6 @@
 #pragma once
 
-enum class inputActions {
+enum class InputActions {
 	eNone,
 	eP1Left,
 	eP1Right,
@@ -10,6 +10,6 @@ enum class inputActions {
 
 class IInput {
 public:
-	virtual void handleInput(inputActions action) = 0;
+	virtual void handleInput(InputActions action) = 0;
 };
 

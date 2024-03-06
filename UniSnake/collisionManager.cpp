@@ -1,4 +1,4 @@
-#include "collisionManager.h"
+#include "CollisionManager.h"
 
 void CollisionManager::addInterface(ICollision* interface) {
 	m_interfaces.push_back(interface);

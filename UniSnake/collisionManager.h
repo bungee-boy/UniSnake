@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "iCollision.h"
-#include "snake.h"
-#include "fruit.h"
+#include "ICollision.h"
+#include "Snake.h"
+#include "Fruit.h"
 
 class CollisionManager {
 public:

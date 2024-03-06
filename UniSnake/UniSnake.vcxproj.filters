@@ -24,25 +24,25 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="snake.cpp">
+    <ClCompile Include="Snake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
+    <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fruit.cpp">
+    <ClCompile Include="Fruit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputManager.cpp">
+    <ClCompile Include="InputManager.cpp">
       <Filter>Manager Files</Filter>
     </ClCompile>
-    <ClCompile Include="drawManager.cpp">
+    <ClCompile Include="DrawManager.cpp">
       <Filter>Manager Files</Filter>
     </ClCompile>
-    <ClCompile Include="collisionManager.cpp">
+    <ClCompile Include="CollisionManager.cpp">
       <Filter>Manager Files</Filter>
     </ClCompile>
-    <ClCompile Include="linkedList.cpp">
+    <ClCompile Include="Tank.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,32 +50,35 @@
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="snake.h">
+    <ClInclude Include="Snake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
+    <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fruit.h">
+    <ClInclude Include="Fruit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iCollision.h">
+    <ClInclude Include="ICollision.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="iDraw.h">
+    <ClInclude Include="IDraw.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="iInput.h">
+    <ClInclude Include="IInput.h">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="inputManager.h">
+    <ClInclude Include="InputManager.h">
       <Filter>Manager Files</Filter>
     </ClInclude>
-    <ClInclude Include="drawManager.h">
+    <ClInclude Include="DrawManager.h">
       <Filter>Manager Files</Filter>
     </ClInclude>
-    <ClInclude Include="collisionManager.h">
+    <ClInclude Include="CollisionManager.h">
       <Filter>Manager Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tank.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

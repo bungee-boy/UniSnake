@@ -1,12 +1,12 @@
-#include "snake.h"
+#include "Snake.h"
 
 const float Snake::Pi = 3.14159265359f;
 const float Snake::Size = 10.0f;
-const float Snake::NodeGap = 1.3f;
-const float Snake::TurnSpeed = 4;
-const float Snake::TurnMax = 15;
-const float Snake::TurnSmoothing = 2;
-const unsigned int Snake::Speed = 3;
+const float Snake::NodeGap = 1.2f;
+const float Snake::TurnSpeed = 3;
+const float Snake::TurnMax = 14;
+const float Snake::TurnSmoothing = 4;
+const unsigned int Snake::Speed = 2;
 
 Snake::ListNode* Snake::ListNode::Head = nullptr;  // Head of linked list
 Snake::ListNode* Snake::ListNode::Tail = nullptr;  // Tail of linked list
@@ -54,21 +54,23 @@ bool Snake::ListNode::isColliding(ICollision* other) {
 }
 
 void Snake::ListNode::collideSnake() {
-	std::cout << "Node -> collidedSnake()\n";
+	std::cout << "Node -> collideSnake()\n";
 }
 
 void Snake::ListNode::collideFruit(int value) {
-	std::cout << "Node -> collidedFruit(" << value << ")\n";
+	std::cout << "Node -> collideFruit(" << value << ")\n";
 }
 
 void Snake::ListNode::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
-Snake::Snake(const sf::Vector2f startPos, const int length) {  // Constructor
+Snake::Snake(const sf::Vector2f startPos, const sf::IntRect screenBounds, bool collideWithSelf, const int length) {  // Constructor
 	setCollisionType(CollisionType::eCircle);
-	if (!ListNode::Texture.loadFromFile("SnakeSegment.png"))  // Load texture
-		std::cerr << "Failed to load SnakeSegment.png" << '\n';
+	m_screenBounds = screenBounds;  // Set screen bounds
+	m_collideSelf = collideWithSelf;  // Set collide with self
+	if (!ListNode::Texture.loadFromFile("textures\\snake.png"))  // Load texture
+		std::cerr << "Failed to load snake.png" << '\n';
 	ListNode::Texture.setSmooth(true);
 	m_pos = startPos;
 	for (int i{ 0 }; i < length; i++) {  // Init linked list
@@ -78,28 +80,29 @@ Snake::Snake(const sf::Vector2f startPos, const int length) {  // Constructor
 	m_pos = startPos;
 }
 
-void Snake::handleInput(inputActions action) {
+void Snake::handleInput(InputActions action) {
 	if (m_updateCount == Speed) {
 		switch (action) {
-		case inputActions::eP1Left:  // Turn left
+		case InputActions::eP1Left:  // Turn left
 			if (m_dirVel > 0)  // Ignore 
 				m_dirVel = 0;
-			else if (m_dirVel > -TurnMax)
+			if (m_dirVel > -TurnMax)
 				m_dirVel -= TurnSpeed;
 			break;
-		case inputActions::eP1Right:  // Turn right
+		case InputActions::eP1Right:  // Turn right
 			if (m_dirVel < 0)
 				m_dirVel = 0;
-			else if (m_dirVel < TurnMax)
+			if (m_dirVel < TurnMax)
 				m_dirVel += TurnSpeed;
 			break;
 		default:  // No input
-			if (m_dirVel > 0)
+			if (m_dirVel >= TurnSmoothing && m_dirVel > 0)
 				m_dirVel -= TurnSmoothing;
-			else if (m_dirVel < 0)
+			else if (m_dirVel <= TurnSmoothing && m_dirVel < 0)
 				m_dirVel += TurnSmoothing;
-			else if (m_dirVel == -TurnSpeed || m_dirVel == TurnSpeed)
+			else if (m_dirVel != 0)
 				m_dirVel = 0;
+			break;
 		}
 
 		if (m_dirVel != 0) {
@@ -139,7 +142,7 @@ bool Snake::isColliding(ICollision* other) {
 }
 
 void Snake::collideSnake() {
-	std::cout << "Snake -> collidedSnake()\n";
+	std::cout << "Snake -> collideSnake()\n";
 }
 
 void Snake::collideFruit(int value) {
@@ -148,15 +151,17 @@ void Snake::collideFruit(int value) {
 
 void Snake::update() {
 	if (m_updateCount == Speed) {
-		ListNode* currNode = ListNode::Head->m_next;  // Check collision with self (start at head + 1)
-		if (currNode != nullptr)
-			currNode = currNode->m_next;
-		while (currNode != nullptr) {  // Check each node in linked list
-			if (currNode->isColliding(ListNode::Head)) {
-				m_isAlive = false;
-				break;
+		if (m_collideSelf) {  // Check collision with self
+			ListNode* currNode = ListNode::Head->m_next;  // start at head + 1
+			if (currNode != nullptr)
+				currNode = currNode->m_next;
+			while (currNode != nullptr) {  // Check each node in linked list
+				if (currNode->isColliding(ListNode::Head)) {
+					m_isAlive = false;
+					break;
+				}
+				currNode = currNode->m_next;
 			}
-			currNode = currNode->m_next;
 		}
 
 		if (m_addNodes > 0) {  // Allow snake to grow
@@ -174,16 +179,33 @@ void Snake::update() {
 		m_pos.x += m_vel.x;  // Move head by the velocity
 		m_pos.y += m_vel.y;
 
-		if (m_pos.x < Size) {  // Wall collision
-			m_pos.x = Size;  // Snap back to inside the wall
+		// Screen bounds collision
+		if (m_pos.x < m_screenBounds.left + Size) {  // Left
+			m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
 			m_vel.x = -m_vel.x;  // Invert velocity
 			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+		}
+		else if (m_pos.x > m_screenBounds.left + m_screenBounds.width - Size) {  // Right
+			m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
+			m_vel.x = -m_vel.x;  // Invert velocity
+			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+		}
+
+		if (m_pos.y < m_screenBounds.top + Size) {  // Top
+			m_pos.y = m_screenBounds.top + Size;  // Snap back to inside the wall
+			m_vel.y = -m_vel.y;  // Invert velocity
+			m_dir = 180 - m_dir;  // Angle to bounce off wall
+		}
+		else if (m_pos.y > m_screenBounds.top + m_screenBounds.height - Size) {  // Bottom
+			m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
+			m_vel.y = -m_vel.y;  // Invert velocity
+			m_dir = 180 - m_dir;  // Angle to bounce off wall
 		}
 
 		addNode(m_pos, m_dir, false);  // Add new node to head
 		delNode();  // Remove tail node
 
-		m_updateCount = 0;
+		m_updateCount = 0;  // Reset counter
 	}
 	else
 		m_updateCount++;

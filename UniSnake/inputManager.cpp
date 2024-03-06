@@ -1,5 +1,5 @@
-#include "inputManager.h"
 #include <iostream>
+#include "InputManager.h"
 
 void InputManager::addInterface(IInput* interface) {
 	m_interfaces.push_back(interface);
@@ -10,11 +10,11 @@ void InputManager::removeInterface(IInput* interface) {
 }
 
 void InputManager::update() {
-	inputActions action = inputActions::eNone;
+	InputActions action = InputActions::eNone;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-		action = inputActions::eP1Left;
+		action = InputActions::eP1Left;
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		action = inputActions::eP1Right;
+		action = InputActions::eP1Right;
 
 	for (IInput* interface : m_interfaces)
 		interface->handleInput(action);
