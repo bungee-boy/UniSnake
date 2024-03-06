@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main() {
-	game* snakeGame = new game();
+	Game* snakeGame = new Game();
 	snakeGame->begin();
 	return 0;
 }

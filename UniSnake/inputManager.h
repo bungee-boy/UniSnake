@@ -3,13 +3,13 @@
 #include "SFML\Graphics.hpp"
 #include "iInput.h"
 
-class inputManager
+class InputManager
 {
 public:
-	void addInterface(iInput* interface);
-	void removeInterface(iInput* interface);
+	void addInterface(IInput* interface);
+	void removeInterface(IInput* interface);
 	void update();
 private:
-	std::vector<iInput*> m_interfaces;
+	std::vector<IInput*> m_interfaces;
 };
 

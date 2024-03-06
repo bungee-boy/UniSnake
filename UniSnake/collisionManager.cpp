@@ -1,32 +1,29 @@
 #include "collisionManager.h"
 
-void collisionManager::addInterface(iCollision* interface) {
+void CollisionManager::addInterface(ICollision* interface) {
 	m_interfaces.push_back(interface);
 }
 
-void collisionManager::removeInterface(iCollision* interface) {
+void CollisionManager::removeInterface(ICollision* interface) {
 	m_interfaces.erase(std::find(m_interfaces.begin(), m_interfaces.end(), interface));
 }
 
-void collisionManager::checkCollision(iCollision* current, iCollision* other) {
+void CollisionManager::checkCollision(ICollision* current, ICollision* other) {
 	if (current->isColliding(other)) {
-		if (dynamic_cast<snake*>(other) != nullptr) {
+		if (dynamic_cast<Snake*>(other) != nullptr)
 			current->collideSnake();
-		}
-		else if (dynamic_cast<fruit*>(other) != nullptr) {
-			static_cast<fruit*>(other)->m_isAlive = false;
-			current->collideFruit(static_cast<fruit*>(other)->getValue());
+		else if (dynamic_cast<Fruit*>(other) != nullptr) {
+			current->collideFruit(static_cast<Fruit*>(other)->getValue());
+			static_cast<Fruit*>(other)->m_isAlive = false;
 		}
 	}
 }
 
-void collisionManager::update() {
+void CollisionManager::update() {
 	for (int current{ 0 }; current < m_interfaces.size(); current++) {
 		for (int other{ 0 }; other < m_interfaces.size(); other++) {
-			if (current != other) {
+			if (current != other)
 				checkCollision(m_interfaces[current], m_interfaces[other]);
-				//checkCollision(m_interfaces[other], m_interfaces[current]);
-			}
 		}
 	}
 }

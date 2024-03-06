@@ -5,15 +5,15 @@
 #include "iCollision.h"
 #include "iDraw.h"
 
-class snake : public iInput, public iCollision, public iDraw {
+class Snake : public IInput, public ICollision, public IDraw {
 public:
 	bool m_isAlive{ true };
-	snake(const sf::Vector2f startPos, const int length = 1);
+	Snake(const sf::Vector2f startPos, const int length = 1);
 	void handleInput(inputActions action) override;  // From iInput.h
 	sf::Vector2f getCircleCenter();  // From iCollision.h
 	sf::FloatRect getRect();  // From iCollision.h
 	float getRadius();  // From iCollision.h
-	bool isColliding(iCollision* other) override;  // From iCollision.h
+	bool isColliding(ICollision* other) override;  // From iCollision.h
 	void collideSnake();  // From iCollision.h
 	void collideFruit(int value);  // From iCollision.h
 	void update();
@@ -25,31 +25,32 @@ private:
 	static const float TurnSpeed;  // Turning speed
 	static const float TurnMax;  // Maximum turning amount
 	static const float TurnSmoothing;  // Turning speed back to 0 (not pressing)
-	static const int Speed;  // Movement speed of the snake (update rate)
+	static const unsigned int Speed;  // Movement speed of the snake (update rate)
 	sf::Vector2f m_pos{ 0, 0 };  // Position
 	sf::Vector2f m_vel{ 0, 0 };  // Velocity
 	float m_dir{ 0 };  // Direction (rotation)
 	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
-	int m_updateCount{ 0 };  // Counter for update
+	unsigned int m_updateCount{ 0 };  // Counter for update
 	unsigned int m_addNodes{ 0 };  // Buffer of nodes to add
 
-	class m_node : public iCollision {  // Node for linked list
+	class ListNode : public ICollision {  // Node for linked list
 	public:
-		m_node(sf::Vector2f pos, float direction, snake* parent);
-		sf::Vector2f getCircleCenter();  // From iCollision.h
-		sf::FloatRect getRect();  // From iCollision.h
-		float getRadius();  // From iCollision.h
-		bool isColliding(iCollision* other) override;  // From iCollision.h
-		void collideSnake();  // From iCollision.h
-		void collideFruit(int value);  // From iCollision.h
+		ListNode(sf::Vector2f pos, float direction, Snake* parent);
+		sf::Vector2f getCircleCenter() override;  // From iCollision.h
+		sf::FloatRect getRect() override;  // From iCollision.h
+		float getRadius() override;  // From iCollision.h
+		bool isColliding(ICollision* other) override;  // From iCollision.h
+		void collideSnake() override;  // From iCollision.h
+		void collideFruit(int value) override;  // From iCollision.h
 		void draw(sf::RenderWindow* window);
 	protected:
-		friend class snake;  // Allow snake to access protected members
-		static sf::Texture m_texture;  // Texture of all nodes
-		static m_node* m_head;  // Head of linked list
-		static m_node* m_tail;  // Tail of linked list
-		m_node* m_next{ nullptr };  // Next node in linked list
-		snake* m_parent{ nullptr };  // Ptr to parent snake (for collision)
+		friend class Snake;  // Allow snake to access protected members
+		static sf::Texture Texture;  // Texture of all nodes
+		static ListNode* Head;  // Head of linked list
+		static ListNode* Tail;  // Tail of linked list
+		ListNode* m_prev{ nullptr };  // Previous node in linked list
+		ListNode* m_next{ nullptr };  // Next node in linked list
+		Snake* m_parent{ nullptr };  // Ptr to parent snake (for collision)
 	private:
 		sf::Vector2f m_pos{ 0, 0 };  // Node position
 		sf::CircleShape m_shape;  // Drawable surface

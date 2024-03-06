@@ -4,12 +4,12 @@
 #include <SFML/Graphics.hpp>
 #include "iDraw.h"
 
-class drawManager
+class DrawManager
 {
 public:
-	void addInterface(iDraw* interface);
-	void removeInterface(iDraw* interface);
+	void addInterface(IDraw* interface);
+	void removeInterface(IDraw* interface);
 	void update(sf::RenderWindow* window);
 private:
-	std::vector<iDraw*> m_interfaces;
+	std::vector<IDraw*> m_interfaces;
 };

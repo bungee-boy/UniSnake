@@ -135,6 +135,7 @@
     <ClCompile Include="fruit.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="inputManager.cpp" />
+    <ClCompile Include="linkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="snake.cpp" />
   </ItemGroup>

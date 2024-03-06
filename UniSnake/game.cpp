@@ -1,7 +1,7 @@
 #include "game.h"
 
-game::game() {
-	srand(time(NULL));
+Game::Game() {
+	srand(static_cast<unsigned int>(time(NULL)));
 	sf::ContextSettings settings;  // Setup window settings
 	settings.antialiasingLevel = 8;
 
@@ -10,15 +10,13 @@ game::game() {
 
 	m_foodTexture1 = new sf::Texture;  // Load textures
 	m_foodTexture2 = new sf::Texture;
-	if (!m_foodTexture1->loadFromFile("Apple.png")) {
+	if (!m_foodTexture1->loadFromFile("Apple.png"))
 		std::cerr << "Failed to load Apple.png" << '\n';
-	}
-	if (!m_foodTexture2->loadFromFile("GoldApple.png")) {
+	if (!m_foodTexture2->loadFromFile("GoldApple.png"))
 		std::cerr << "Failed to load GoldApple.png" << '\n';
-	}
 }
 
-void game::begin() {
+void Game::begin() {
 	addSnake();
 	addFruit();
 
@@ -55,29 +53,29 @@ void game::begin() {
 	}
 }
 
-void game::addSnake() {
-	snake* tempSnake = new snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 5);
+void Game::addSnake() {
+	Snake* tempSnake = new Snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) }, 5);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
 	m_snakes.push_back(tempSnake);
 }
 
-void game::delSnake(snake* obj) {
+void Game::delSnake(Snake* obj) {
 	m_input.removeInterface(obj);
 	m_collision.removeInterface(obj);
 	m_draw.removeInterface(obj);
 	m_snakes.erase(std::find(m_snakes.begin(), m_snakes.end(), obj));
 }
 
-void game::addFruit() {
-	fruit* tempFruit = new fruit(10, m_foodTexture1, { static_cast<float>(rand() % m_screenSize.x), static_cast<float>(rand() % m_screenSize.y) }, collisionType::eCircle);
+void Game::addFruit() {
+	Fruit* tempFruit = new Fruit(10, m_foodTexture1, { static_cast<float>(rand() % m_screenSize.x), static_cast<float>(rand() % m_screenSize.y) }, CollisionType::eCircle);
 	m_collision.addInterface(tempFruit);
 	m_draw.addInterface(tempFruit);
 	m_fruits.push_back(tempFruit);
 }
 
-void game::delFruit(fruit* obj) {
+void Game::delFruit(Fruit* obj) {
 	m_collision.removeInterface(obj);
 	m_draw.removeInterface(obj);
 	m_fruits.erase(std::find(m_fruits.begin(), m_fruits.end(), obj));

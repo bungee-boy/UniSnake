@@ -7,26 +7,24 @@
 #include "snake.h"
 #include "fruit.h"
 
-class game
+class Game
 {
 public:
-	game();
+	Game();
 	void begin();
 private:
 	void addSnake();
-	void delSnake(snake* obj);
+	void delSnake(Snake* obj);
 	void addFruit();
-	void delFruit(fruit* obj);
+	void delFruit(Fruit* obj);
 	const sf::Vector2u m_screenSize{ 1000, 1000 };  // Screen size
 	unsigned int m_fps{ 60 };  // FPS
-	sf::RectangleShape m_rect;  // Load rect class
-	sf::CircleShape m_circle;  // Load circle class
 	sf::RenderWindow* m_window;  // Window (screen)
-	drawManager m_draw;  // Draw manager
-	inputManager m_input;  // Input manager
-	collisionManager m_collision;  // Collision manager
-	std::vector<snake*> m_snakes;  // Vector of snakes
-	std::vector<fruit*> m_fruits;  // Vector of foods
+	DrawManager m_draw;  // Draw manager
+	InputManager m_input;  // Input manager
+	CollisionManager m_collision;  // Collision manager
+	std::vector<Snake*> m_snakes;  // Vector of snakes
+	std::vector<Fruit*> m_fruits;  // Vector of foods
 	sf::Texture* m_foodTexture1;
 	sf::Texture* m_foodTexture2;
 };

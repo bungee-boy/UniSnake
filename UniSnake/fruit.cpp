@@ -1,51 +1,50 @@
 #include "fruit.h"
 
-fruit::fruit(int value, sf::Texture* texture, sf::Vector2f pos, collisionType collision) {
+Fruit::Fruit(int value, sf::Texture* texture, sf::Vector2f pos, CollisionType collision) {
 	setCollisionType(collision);
 	m_value = value;
 	m_texture = *texture;
 	m_pos = pos;
 	m_sprite = sf::Sprite(m_texture);
 	m_sprite.setTexture(m_texture);
-	if (getCollisionType() == collisionType::eCircle)  // Center circle if fruit is round
+	if (getCollisionType() == CollisionType::eCircle)  // Center circle if fruit is round
 		m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2, m_sprite.getLocalBounds().height / 2);
 	m_sprite.setPosition(m_pos);
 }
 
-void fruit::move(float x, float y) {
+void Fruit::move(float x, float y) {
 	m_pos.x += x;
 	m_pos.y += y;
 	m_sprite.setPosition(m_pos);
 }
 
-int fruit::getValue() {
+int Fruit::getValue() {
 	return m_value;
 }
 
-sf::Vector2f fruit::getCircleCenter() {
+sf::Vector2f Fruit::getCircleCenter() {
 	return m_pos;
 }
 
-sf::FloatRect fruit::getRect() {
+sf::FloatRect Fruit::getRect() {
 	return m_sprite.getGlobalBounds();
 }
 
-float fruit::getRadius() {
+float Fruit::getRadius() {
 	return m_sprite.getLocalBounds().width / 2;
 }
 
-bool fruit::isColliding(iCollision* other) {
+bool Fruit::isColliding(ICollision* other) {
 	switch (other->getCollisionType()) {
-	case collisionType::eRect:
+	case CollisionType::eRect:
 		break;
-	case collisionType::eCircle: {
+	case CollisionType::eCircle: {
 		sf::Vector2f offset = getCircleCenter() - other->getCircleCenter();
 		float distance = (offset.x * offset.x) + (offset.y * offset.y);  // Offset ^ 2
 
 		float radius = getRadius() + other->getRadius();
 		radius *= radius;  // Radius ^ 2
 
-		//std::cout << getCircleCenter().x << ',' << getCircleCenter().y << ' ' << other->getCircleCenter().x << ',' << other->getCircleCenter().y << '\n';
 		if (distance <= radius)
 			return true;
 	}
@@ -53,16 +52,14 @@ bool fruit::isColliding(iCollision* other) {
 	return false;
 }
 
-void fruit::collideSnake() {
+void Fruit::collideSnake() {
 	m_isAlive = false;
-	//std::cout << "Fruit -> collidedSnake()\n";
 }
 
-void fruit::collideFruit(int value) {
+void Fruit::collideFruit(int value) {
 	m_isAlive = false;
-	//std::cout << "Fruit -> collidedFruit(" << value << ")\n";
 }
 
-void fruit::draw(sf::RenderWindow* window) {
+void Fruit::draw(sf::RenderWindow* window) {
 	window->draw(m_sprite);
 }

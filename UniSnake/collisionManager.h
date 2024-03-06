@@ -5,12 +5,12 @@
 #include "snake.h"
 #include "fruit.h"
 
-class collisionManager {
+class CollisionManager {
 public:
-	void addInterface(iCollision* interface);
-	void removeInterface(iCollision* interface);
-	void checkCollision(iCollision* current, iCollision* other);
+	void addInterface(ICollision* interface);
+	void removeInterface(ICollision* interface);
+	void checkCollision(ICollision* current, ICollision* other);
 	void update();
 private:
-	std::vector<iCollision*> m_interfaces;
+	std::vector<ICollision*> m_interfaces;
 };
