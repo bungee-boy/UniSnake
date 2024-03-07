@@ -73,6 +73,7 @@ Snake::Snake(const sf::Vector2f startPos, const sf::IntRect screenBounds, bool c
 		std::cerr << "Failed to load snake.png" << '\n';
 	ListNode::Texture.setSmooth(true);
 	m_pos = startPos;
+	m_addNodes = length;
 	for (int i{ 0 }; i < length; i++) {  // Init linked list
 		addNode(m_pos, m_dir);
 		m_pos.y += Size + NodeGap;

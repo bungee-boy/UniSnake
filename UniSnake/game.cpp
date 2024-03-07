@@ -8,14 +8,13 @@ Game::Game() {
 	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
-	m_gameMode = GameMode::eArcade;  // Set game mode
+	m_gameMode = GameMode::eClassic;  // Set game mode
 
 	Fruit::loadTextures();  // Load fruit textures
 }
 
 void Game::begin() {
 	addSnake();
-	addFruit();
 
 	while (m_window->isOpen()) {  // Main loop
 		sf::Event event;  // Fetch & process window events
@@ -43,7 +42,7 @@ void Game::begin() {
 				delFruit(m_fruits[i]);
 		}
 
-		m_window->clear({ 50, 50, 50, 255 });   // Remove previous frame
+		m_window->clear({ 150, 150, 150, 255 });   // Remove previous frame
 		m_draw.update(m_window);
 		m_window->display();
 	}
