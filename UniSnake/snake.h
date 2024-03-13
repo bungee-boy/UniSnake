@@ -7,7 +7,7 @@
 class Snake : public IInput, public ICollision, public IDraw {
 public:
 	bool m_isAlive{ true };
-	Snake(const sf::Vector2f startPos, const sf::IntRect screenBounds, bool collideWithSelf = true, const int length = 1);
+	Snake(const sf::Vector2f startPos, const sf::FloatRect screenBounds, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);
 	void handleInput(InputActions action) override;  // From iInput.h
 	sf::Vector2f getCircleCenter();  // From iCollision.h
 	sf::FloatRect getRect();  // From iCollision.h
@@ -24,15 +24,17 @@ private:
 	static const float TurnSpeed;  // Turning speed
 	static const float TurnMax;  // Maximum turning amount
 	static const float TurnSmoothing;  // Turning speed back to 0 (not pressing)
+	static const unsigned int Gravity;  // Turning speed out of water
 	static const unsigned int Speed;  // Movement speed of the snake (update rate)
-	sf::IntRect m_screenBounds;  // Screen boundary (tank)
+	sf::Vector2u m_screenSize;  // Screen size
+	sf::FloatRect m_screenBounds;  // Screen boundary (tank)
 	sf::Vector2f m_pos{ 0, 0 };  // Position
-	sf::Vector2f m_vel{ 0, 0 };  // Velocity
 	float m_dir{ 0 };  // Direction (rotation)
 	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
 	unsigned int m_updateCount{ 0 };  // Counter for update
 	unsigned int m_addNodes{ 0 };  // Buffer of nodes to add
 	bool m_collideSelf{ true };  // Toggle colliding with itself
+	bool m_bounceWall{ false };  // Toggle bouncing off walls
 
 	class ListNode : public ICollision {  // Node for linked list
 	public:
@@ -59,5 +61,6 @@ private:
 
 	void addNode(const sf::Vector2f pos, const float direction, const bool to_tail = true);  // Add a new node to linked list
 	void delNode(const bool del_tail = true);  // Delete the tail node
+	void gravity();  // Apply gravity
 };
 

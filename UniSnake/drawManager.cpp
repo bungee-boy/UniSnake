@@ -1,7 +1,10 @@
 #include "DrawManager.h"
 
-void DrawManager::addInterface(IDraw* interface) {
-	m_interfaces.push_back(interface);
+void DrawManager::addInterface(IDraw* interface, bool push_front) {
+	if (push_front)
+		m_interfaces.insert(m_interfaces.begin(), interface);
+	else
+		m_interfaces.push_back(interface);
 }
 
 void DrawManager::removeInterface(IDraw* interface) {

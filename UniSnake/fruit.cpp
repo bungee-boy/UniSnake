@@ -6,7 +6,7 @@ sf::Texture Fruit::TextureThree;
 sf::Texture Fruit::TextureFour;
 sf::Texture Fruit::TextureFive;
 
-Fruit::Fruit(unsigned int value, sf::Vector2f pos, CollisionType collision) {
+Fruit::Fruit(unsigned int value, sf::FloatRect screenBounds, CollisionType collision) {
 	setCollisionType(collision);
 	m_value = value;
 	switch (m_value) {
@@ -25,9 +25,15 @@ Fruit::Fruit(unsigned int value, sf::Vector2f pos, CollisionType collision) {
 	default:
 		std::cerr << "Fruit value is out of range 2->5 ! (m_value: " << m_value << ")\n";
 	}
-	m_pos = pos;
-	if (getCollisionType() == CollisionType::eCircle)  // Center circle if fruit is round
+
+	m_pos.x = (rand() % static_cast<int>((screenBounds.width - m_sprite.getLocalBounds().width))) + screenBounds.left;  // Bound to width + offset
+	m_pos.y = (rand() % static_cast<int>((screenBounds.height - m_sprite.getLocalBounds().height))) + screenBounds.top;  // Bound to height + offset
+
+	if (getCollisionType() == CollisionType::eCircle) {  // Center circle if fruit is round
+		m_pos.x += m_sprite.getLocalBounds().width / 2;  // Offset position to visually stay
+		m_pos.y += m_sprite.getLocalBounds().height / 2;
 		m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2, m_sprite.getLocalBounds().height / 2);
+	}
 	m_sprite.setPosition(m_pos);
 }
 

@@ -8,22 +8,27 @@ Game::Game() {
 	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
-	m_gameMode = GameMode::eClassic;  // Set game mode
+	m_tank = new Tank({ 80, 60, static_cast<float>(m_screenSize.x - 200), static_cast<float>(m_screenSize.y - 200) });
 
 	Fruit::loadTextures();  // Load fruit textures
 }
 
 void Game::begin() {
-	addSnake();
-
 	while (m_window->isOpen()) {  // Main loop
+		addSnake();
+		startGame();
+	}
+}
+
+void Game::startGame() {
+	while (m_window->isOpen() && m_snakes.size() > 0) {
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 				m_window->close();  // Quit if window closed or Esc pressed
 		}
 
-		if (m_fruits.size() < 5 && rand() % 80 == 0)
+		if (m_fruits.size() < 5 && rand() % 100 == 0)
 			addFruit();
 
 		m_input.update();  // Check input keys
@@ -42,15 +47,18 @@ void Game::begin() {
 				delFruit(m_fruits[i]);
 		}
 
-		m_window->clear({ 150, 150, 150, 255 });   // Remove previous frame
+		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
+
 		m_draw.update(m_window);
+		m_tank->drawTank(m_window);
+		m_tank->drawWater(m_window);
 		m_window->display();
 	}
 }
 
 void Game::addSnake() {
-	Snake* tempSnake = new Snake({ static_cast<float>(m_screenSize.x / 2), static_cast<float>(m_screenSize.y / 2) },
-								 { 0, 0, static_cast<int>(m_screenSize.x), static_cast<int>(m_screenSize.y) }, (m_gameMode == GameMode::eArcade) ? false : true, 2);
+	sf::FloatRect tankRect = m_tank->getWaterRect();
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, true);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
@@ -65,7 +73,7 @@ void Game::delSnake(Snake* obj) {
 }
 
 void Game::addFruit() {
-	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, {static_cast<float>(rand() % m_screenSize.x), static_cast<float>(rand() % m_screenSize.y)}, CollisionType::eCircle);
+	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, m_tank->getWaterRect(), CollisionType::eCircle);
 	m_collision.addInterface(tempFruit);
 	m_draw.addInterface(tempFruit);
 	m_fruits.push_back(tempFruit);

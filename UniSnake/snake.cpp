@@ -6,6 +6,7 @@ const float Snake::NodeGap = 1.2f;
 const float Snake::TurnSpeed = 3;
 const float Snake::TurnMax = 14;
 const float Snake::TurnSmoothing = 4;
+const unsigned int Snake::Gravity = 13;
 const unsigned int Snake::Speed = 2;
 
 Snake::ListNode* Snake::ListNode::Head = nullptr;  // Head of linked list
@@ -65,10 +66,12 @@ void Snake::ListNode::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
-Snake::Snake(const sf::Vector2f startPos, const sf::IntRect screenBounds, bool collideWithSelf, const int length) {  // Constructor
+Snake::Snake(const sf::Vector2f startPos, const sf::FloatRect screenBounds, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
 	setCollisionType(CollisionType::eCircle);
+	m_screenSize = screenSize;  // Set screen size
 	m_screenBounds = screenBounds;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
+	m_bounceWall = bounceOffWalls;  // Set bounce off walls
 	if (!ListNode::Texture.loadFromFile("textures\\snake.png"))  // Load texture
 		std::cerr << "Failed to load snake.png" << '\n';
 	ListNode::Texture.setSmooth(true);
@@ -82,7 +85,7 @@ Snake::Snake(const sf::Vector2f startPos, const sf::IntRect screenBounds, bool c
 }
 
 void Snake::handleInput(InputActions action) {
-	if (m_updateCount == Speed) {
+	if (m_updateCount == Speed && m_screenBounds.contains(m_pos)) {  // Limit speed & when in water
 		switch (action) {
 		case InputActions::eP1Left:  // Turn left
 			if (m_dirVel > 0)  // Ignore 
@@ -152,6 +155,12 @@ void Snake::collideFruit(int value) {
 
 void Snake::update() {
 	if (m_updateCount == Speed) {
+		if (ListNode::Tail->getCircleCenter().x < 0 || ListNode::Tail->getCircleCenter().x > m_screenSize.x ||
+			ListNode::Tail->getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
+			m_isAlive = false;  // Mark self for deletion
+			return;  // Stop all updates
+		}
+		
 		if (m_collideSelf) {  // Check collision with self
 			ListNode* currNode = ListNode::Head->m_next;  // start at head + 1
 			if (currNode != nullptr)
@@ -174,33 +183,37 @@ void Snake::update() {
 				m_addNodes = 0;
 		}
 
-		m_vel.x = std::roundf(cos((- m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Calculate the head's velocity
-		m_vel.y = -std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
-
-		m_pos.x += m_vel.x;  // Move head by the velocity
-		m_pos.y += m_vel.y;
+		m_pos.x += std::roundf(cos((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Move the head by the velocity
+		m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
 
 		// Screen bounds collision
 		if (m_pos.x < m_screenBounds.left + Size) {  // Left
-			m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
-			m_vel.x = -m_vel.x;  // Invert velocity
-			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+			if (m_bounceWall) {
+				m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
+				m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+			}
+			else
+				gravity();
 		}
 		else if (m_pos.x > m_screenBounds.left + m_screenBounds.width - Size) {  // Right
-			m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
-			m_vel.x = -m_vel.x;  // Invert velocity
-			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+			if (m_bounceWall) {
+				m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
+				m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+			}
+			else
+				gravity();
 		}
 
 		if (m_pos.y < m_screenBounds.top + Size) {  // Top
-			m_pos.y = m_screenBounds.top + Size;  // Snap back to inside the wall
-			m_vel.y = -m_vel.y;  // Invert velocity
-			m_dir = 180 - m_dir;  // Angle to bounce off wall
+			gravity();
 		}
 		else if (m_pos.y > m_screenBounds.top + m_screenBounds.height - Size) {  // Bottom
-			m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
-			m_vel.y = -m_vel.y;  // Invert velocity
-			m_dir = 180 - m_dir;  // Angle to bounce off wall
+			if (m_bounceWall) {
+				m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
+				m_dir = 180 - m_dir;  // Angle to bounce off wall
+			}
+			else
+				gravity();
 		}
 
 		addNode(m_pos, m_dir, false);  // Add new node to head
@@ -258,4 +271,13 @@ void Snake::delNode(const bool del_tail) {
 		ListNode::Head = ListNode::Head->m_next;  // Move head down 1 (D -> H -> N)
 		delete oldHead;  // Delete old head (     H -> N)
 	}
+}
+
+void Snake::gravity() {
+	if (m_dir > 180 + Gravity)  // Facing left
+		m_dir -= Gravity;  // Turn down
+	else if (m_dir < 180 - Gravity) // Facing right
+		m_dir += Gravity;  // Turn down
+	else
+		m_dir = 180;
 }
