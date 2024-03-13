@@ -4,10 +4,10 @@ const float Snake::Pi = 3.14159265359f;
 const float Snake::Size = 10.0f;
 const float Snake::NodeGap = 1.2f;
 const float Snake::TurnSpeed = 3;
-const float Snake::TurnMax = 14;
+const float Snake::TurnMax = 15;
 const float Snake::TurnSmoothing = 4;
-const unsigned int Snake::Gravity = 13;
-const unsigned int Snake::Speed = 2;
+const unsigned int Snake::Gravity = 10;
+const unsigned int Snake::Speed = 0;
 
 Snake::ListNode* Snake::ListNode::Head = nullptr;  // Head of linked list
 Snake::ListNode* Snake::ListNode::Tail = nullptr;  // Tail of linked list

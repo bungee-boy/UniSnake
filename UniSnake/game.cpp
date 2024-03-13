@@ -28,25 +28,28 @@ void Game::startGame() {
 				m_window->close();  // Quit if window closed or Esc pressed
 		}
 
-		if (m_fruits.size() < 5 && rand() % 100 == 0)
-			addFruit();
+		if (m_ticks.getElapsedTime() >= sf::seconds(1 / m_tps)) {  // Keep update rate independent to FPS
+			m_ticks.restart();
+			if (m_fruits.size() < 5 && rand() % 100 == 0)
+				addFruit();
 
-		m_input.update();  // Check input keys
+			m_input.update();  // Check input keys
 
-		for (int i{ 0 }; i < m_snakes.size(); i++)  // Update snakes
-			m_snakes[i]->update();
+			for (int i{ 0 }; i < m_snakes.size(); i++)  // Update snakes
+				m_snakes[i]->update();
 
-		m_collision.update();
+			m_collision.update();
 
-		for (int i{ 0 }; i < m_snakes.size(); i++) {
-			if (!m_snakes[i]->m_isAlive)
-				delSnake(m_snakes[i]);
+			for (int i{ 0 }; i < m_snakes.size(); i++) {
+				if (!m_snakes[i]->m_isAlive)
+					delSnake(m_snakes[i]);
+			}
+			for (int i{ 0 }; i < m_fruits.size(); i++) {  // Check if any fruit have died
+				if (!m_fruits[i]->m_isAlive)
+					delFruit(m_fruits[i]);
+			}
 		}
-		for (int i{ 0 }; i < m_fruits.size(); i++) {  // Check if any fruit have died
-			if (!m_fruits[i]->m_isAlive)
-				delFruit(m_fruits[i]);
-		}
-
+		
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
 
 		m_draw.update(m_window);

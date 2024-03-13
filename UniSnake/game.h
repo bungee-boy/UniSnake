@@ -21,8 +21,10 @@ private:
 	void delFruit(Fruit* obj);
 	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
 	const sf::Vector2u m_screenSize{ 1280, 720 };  // Screen size
-	unsigned int m_fps{ 60 };  // FPS
+	unsigned int m_fps{ 60 };  // Frames Per Second (FPS)
+	unsigned int m_tps{ 5 };  // Ticks Per Second (TPS)
 	sf::RenderWindow* m_window;  // Window (screen)
+	sf::Clock m_ticks;  // Game ticks
 	DrawManager m_draw;  // Draw manager
 	InputManager m_input;  // Input manager
 	CollisionManager m_collision;  // Collision manager
