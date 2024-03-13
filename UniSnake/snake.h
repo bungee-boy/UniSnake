@@ -8,6 +8,7 @@ class Snake : public IInput, public ICollision, public IDraw {
 public:
 	bool m_isAlive{ true };
 	Snake(const sf::Vector2f startPos, const sf::FloatRect screenBounds, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);
+	~Snake();
 	void handleInput(InputActions action) override;  // From iInput.h
 	sf::Vector2f getCircleCenter();  // From iCollision.h
 	sf::FloatRect getRect();  // From iCollision.h

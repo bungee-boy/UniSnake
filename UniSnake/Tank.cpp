@@ -27,7 +27,7 @@ Tank::Tank(const sf::FloatRect rect) {
 
 	m_water.setPosition({ m_rect.left + TankWidth, m_rect.top });
 	m_water.setSize({ m_rect.width - (TankWidth * 2), m_rect.height - TankWidth});
-	m_water.setFillColor({ 20, 25, 255, 100 });
+	m_water.setFillColor({ 50, 50, 255, 50 });
 }
 
 sf::FloatRect Tank::getWaterRect() {

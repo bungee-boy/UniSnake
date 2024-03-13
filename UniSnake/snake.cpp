@@ -84,6 +84,11 @@ Snake::Snake(const sf::Vector2f startPos, const sf::FloatRect screenBounds, cons
 	m_pos = startPos;
 }
 
+Snake::~Snake() {
+	while (ListNode::Head != nullptr)  // Delete all nodes (memory leak if not)
+		delNode();
+}
+
 void Snake::handleInput(InputActions action) {
 	if (m_updateCount == Speed && m_screenBounds.contains(m_pos)) {  // Limit speed & when in water
 		switch (action) {
@@ -121,10 +126,14 @@ void Snake::handleInput(InputActions action) {
 }
 
 sf::Vector2f Snake::getCircleCenter() { 
+	if (ListNode::Head == nullptr)
+		throw "Head is nullptr, cannot return center!";
 	return ListNode::Head->getCircleCenter();
 }
 
 sf::FloatRect Snake::getRect() {
+	if (ListNode::Head == nullptr)
+		throw "Head is nullptr, cannot return rect!";
 	return ListNode::Head->getRect();
 }
 
@@ -260,16 +269,36 @@ void Snake::addNode(const sf::Vector2f pos, const float direction, const bool to
 }
 
 void Snake::delNode(const bool del_tail) {
-	if (del_tail) {  // Delete tail
-		ListNode* tempNode = ListNode::Tail->m_prev;  // Get tail - 1 (N -> N -> T)
-		delete ListNode::Tail;  // Delete tail (N -> N -> D)
-		ListNode::Tail = tempNode;  // Set tail to - 1 (N -> T ->  )
-		ListNode::Tail->m_next = nullptr;  // Remove pointer to old tail (N -> T)
+	if (del_tail) {  // Remove from tail
+		if (ListNode::Tail == nullptr && ListNode::Head != nullptr) {  // If only head
+			delete ListNode::Head;  // Delete head
+			ListNode::Head = nullptr;
+		}
+		else if (ListNode::Tail != nullptr) {  // If tail exists
+			ListNode::Tail = ListNode::Tail->m_prev;  // Remove tail
+			delete ListNode::Tail->m_next;
+			ListNode::Tail->m_next = nullptr;
+			if (ListNode::Tail == ListNode::Head)  // If head and tail are same
+				ListNode::Tail = nullptr;  // Don't delete but set tail to null
+		}
+		else
+			std::cerr << "WARN -> Snake::delNode(true) called when list is empty!\n";
 	}
-	else {  // Delete head
-		ListNode* oldHead = ListNode::Head;  // Save old head (H -> N -> N)
-		ListNode::Head = ListNode::Head->m_next;  // Move head down 1 (D -> H -> N)
-		delete oldHead;  // Delete old head (     H -> N)
+	else {  // Remove from head
+		if (ListNode::Head == nullptr && ListNode::Tail != nullptr) {  // If only tail (should never happen!)
+			delete ListNode::Tail;
+			ListNode::Tail = nullptr;
+			std::cerr << "WARN -> Snake::delNode(false) ListNode::Head was nullptr when ListNode::Tail was not!\n";
+		}
+		else if (ListNode::Head != nullptr) {  // If head exists
+			ListNode::Head = ListNode::Head->m_next;
+			delete ListNode::Head->m_prev;
+			ListNode::Head->m_prev = nullptr;
+			if (ListNode::Head == ListNode::Tail)  // If head and tail are same
+				ListNode::Tail = nullptr;  // Don't delete but set tail to null
+		}
+		else
+			std::cerr << "WARN -> Snake::delNode(false) called when list is empty!\n";
 	}
 }
 

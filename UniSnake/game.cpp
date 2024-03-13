@@ -58,7 +58,7 @@ void Game::startGame() {
 
 void Game::addSnake() {
 	sf::FloatRect tankRect = m_tank->getWaterRect();
-	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, true);
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, false);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
@@ -70,6 +70,7 @@ void Game::delSnake(Snake* obj) {
 	m_collision.removeInterface(obj);
 	m_draw.removeInterface(obj);
 	m_snakes.erase(std::find(m_snakes.begin(), m_snakes.end(), obj));
+	delete obj;
 }
 
 void Game::addFruit() {
