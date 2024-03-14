@@ -2,6 +2,8 @@
 
 const int Tank::TankWidth{ 8 };
 const int Tank::TankBorder{ 3 };
+const sf::Color Tank::TankInnerCol{ 150, 150, 150, 255 };
+const sf::Color Tank::TankOuterCol{ 50, 50, 50, 255 };
 
 Tank::Tank(const sf::FloatRect rect) {
 	m_rect = rect;
@@ -10,12 +12,12 @@ Tank::Tank(const sf::FloatRect rect) {
 	m_tankRight.setOutlineThickness(-TankBorder);
 	m_tankBottom.setOutlineThickness(-TankBorder);
 
-	m_tankLeft.setFillColor({ 150, 150, 150, 255 });
-	m_tankLeft.setOutlineColor({ 50, 50, 50, 255 });
-	m_tankRight.setFillColor({ 150, 150, 150, 255 });
-	m_tankRight.setOutlineColor({ 50, 50, 50, 255 });
-	m_tankBottom.setFillColor({ 150, 150, 150, 255 });
-	m_tankBottom.setOutlineColor({ 50, 50, 50, 255 });
+	m_tankLeft.setFillColor(TankInnerCol);  // Set colour for borders
+	m_tankLeft.setOutlineColor(TankOuterCol);
+	m_tankRight.setFillColor(TankInnerCol);
+	m_tankRight.setOutlineColor(TankOuterCol);
+	m_tankBottom.setFillColor(TankInnerCol);
+	m_tankBottom.setOutlineColor(TankOuterCol);
 
 	m_tankLeft.setSize({ TankWidth, m_rect.height });  // Sides
 	m_tankRight.setSize({ TankWidth, m_rect.height });

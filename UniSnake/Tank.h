@@ -12,6 +12,8 @@ public:
 private:
 	static const int TankWidth;
 	static const int TankBorder;
+	static const sf::Color TankInnerCol;
+	static const sf::Color TankOuterCol;
 	sf::FloatRect m_rect;
 	unsigned int m_waterLevel{ 0 };
 	sf::RectangleShape m_tankLeft;

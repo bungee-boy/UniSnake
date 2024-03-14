@@ -89,14 +89,19 @@ Snake::~Snake() {
 		delNode();
 }
 
-void Snake::handleInput(InputActions action) {
+void Snake::handleInput(InputActions action, float dataValue) {
 	if (m_updateCount == Speed && m_screenBounds.contains(m_pos)) {  // Limit speed & when in water
 		switch (action) {
 		case InputActions::eP1Left:  // Turn left
-			if (m_dirVel > 0)  // Ignore 
-				m_dirVel = 0;
-			if (m_dirVel > -TurnMax)
-				m_dirVel -= TurnSpeed;
+			if (dataValue == 0.0f) {  // Keyboard
+				if (m_dirVel > 0)  // Ignore 
+					m_dirVel = 0;
+				if (m_dirVel > -TurnMax)
+					m_dirVel -= TurnSpeed;
+			}
+			else {
+				m_dirVel = TurnMax / dataValue;
+			}
 			break;
 		case InputActions::eP1Right:  // Turn right
 			if (m_dirVel < 0)

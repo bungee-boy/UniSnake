@@ -14,6 +14,7 @@ Game::Game() {
 }
 
 void Game::begin() {
+	std::cout << m_input.setP1Controller(0) << '\n';
 	while (m_window->isOpen()) {  // Main loop
 		addSnake();
 		startGame();
@@ -27,10 +28,10 @@ void Game::startGame() {
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 				m_window->close();  // Quit if window closed or Esc pressed
 		}
-
-		if (m_ticks.getElapsedTime() >= sf::seconds(1 / m_tps)) {  // Keep update rate independent to FPS
+		if (m_ticks.getElapsedTime() >= sf::seconds(1.0f / m_tps)) {  // Keep update rate independent to FPS
 			m_ticks.restart();
-			if (m_fruits.size() < 5 && rand() % 100 == 0)
+
+			if (m_fruits.size() < 5 && rand() % 100 == 0 || m_fruits.size() == 0)  // Ramdomly spawn fruit (unless none then always, max 5)
 				addFruit();
 
 			m_input.update();  // Check input keys
