@@ -10,6 +10,6 @@ enum class InputActions {
 
 class IInput {
 public:
-	virtual void handleInput(InputActions action, float dataValue = 0) = 0;
+	virtual void handleInput(InputActions action, float dataValue = 0.0f) = 0;
 };
 

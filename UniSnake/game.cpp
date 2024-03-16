@@ -62,7 +62,7 @@ void Game::startGame() {
 
 void Game::addSnake() {
 	sf::FloatRect tankRect = m_tank->getWaterRect();
-	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, false);
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, true);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);

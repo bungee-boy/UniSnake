@@ -7,7 +7,6 @@ const float Snake::TurnSpeed = 3;
 const float Snake::TurnMax = 15;
 const float Snake::TurnSmoothing = 4;
 const unsigned int Snake::Gravity = 10;
-const unsigned int Snake::Speed = 0;
 
 Snake::ListNode* Snake::ListNode::Head = nullptr;  // Head of linked list
 Snake::ListNode* Snake::ListNode::Tail = nullptr;  // Tail of linked list
@@ -90,7 +89,7 @@ Snake::~Snake() {
 }
 
 void Snake::handleInput(InputActions action, float dataValue) {
-	if (m_updateCount == Speed && m_screenBounds.contains(m_pos)) {  // Limit speed & when in water
+	if (m_screenBounds.contains(m_pos)) {  // Limit to only in water
 		switch (action) {
 		case InputActions::eP1Left:  // Turn left
 			if (dataValue == 0.0f) {  // Keyboard
@@ -99,15 +98,20 @@ void Snake::handleInput(InputActions action, float dataValue) {
 				if (m_dirVel > -TurnMax)
 					m_dirVel -= TurnSpeed;
 			}
-			else {
-				m_dirVel = TurnMax / dataValue;
+			else {  // Controller
+				m_dirVel = (TurnMax / 100) * dataValue;
 			}
 			break;
 		case InputActions::eP1Right:  // Turn right
-			if (m_dirVel < 0)
-				m_dirVel = 0;
-			if (m_dirVel < TurnMax)
-				m_dirVel += TurnSpeed;
+			if (dataValue == 0.0f) {  // Keyboard
+				if (m_dirVel < 0)
+					m_dirVel = 0;
+				if (m_dirVel < TurnMax)
+					m_dirVel += TurnSpeed;
+			}
+			else {  // Controller
+				m_dirVel = (TurnMax / 100) * dataValue;
+			}
 			break;
 		default:  // No input
 			if (m_dirVel >= TurnSmoothing && m_dirVel > 0)
@@ -168,75 +172,69 @@ void Snake::collideFruit(int value) {
 }
 
 void Snake::update() {
-	if (m_updateCount == Speed) {
-		if (ListNode::Tail->getCircleCenter().x < 0 || ListNode::Tail->getCircleCenter().x > m_screenSize.x ||
-			ListNode::Tail->getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
-			m_isAlive = false;  // Mark self for deletion
-			return;  // Stop all updates
-		}
-		
-		if (m_collideSelf) {  // Check collision with self
-			ListNode* currNode = ListNode::Head->m_next;  // start at head + 1
-			if (currNode != nullptr)
-				currNode = currNode->m_next;
-			while (currNode != nullptr) {  // Check each node in linked list
-				if (currNode->isColliding(ListNode::Head)) {
-					m_isAlive = false;
-					break;
-				}
-				currNode = currNode->m_next;
-			}
-		}
-
-		if (m_addNodes > 0) {  // Allow snake to grow
-			if (ListNode::Head != nullptr) {  // Can only grow if there is an existing node
-				addNode(ListNode::Head->m_pos, ListNode::Head->m_shape.getRotation());
-				m_addNodes--;
-			}
-			else
-				m_addNodes = 0;
-		}
-
-		m_pos.x += std::roundf(cos((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Move the head by the velocity
-		m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
-
-		// Screen bounds collision
-		if (m_pos.x < m_screenBounds.left + Size) {  // Left
-			if (m_bounceWall) {
-				m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
-				m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
-			}
-			else
-				gravity();
-		}
-		else if (m_pos.x > m_screenBounds.left + m_screenBounds.width - Size) {  // Right
-			if (m_bounceWall) {
-				m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
-				m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
-			}
-			else
-				gravity();
-		}
-
-		if (m_pos.y < m_screenBounds.top + Size) {  // Top
-			gravity();
-		}
-		else if (m_pos.y > m_screenBounds.top + m_screenBounds.height - Size) {  // Bottom
-			if (m_bounceWall) {
-				m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
-				m_dir = 180 - m_dir;  // Angle to bounce off wall
-			}
-			else
-				gravity();
-		}
-
-		addNode(m_pos, m_dir, false);  // Add new node to head
-		delNode();  // Remove tail node
-
-		m_updateCount = 0;  // Reset counter
+	if (ListNode::Tail->getCircleCenter().x < 0 || ListNode::Tail->getCircleCenter().x > m_screenSize.x ||
+		ListNode::Tail->getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
+		m_isAlive = false;  // Mark self for deletion
+		return;  // Stop all updates
 	}
-	else
-		m_updateCount++;
+		
+	if (m_collideSelf) {  // Check collision with self
+		ListNode* currNode = ListNode::Head->m_next;  // start at head + 1
+		if (currNode != nullptr)
+			currNode = currNode->m_next;
+		while (currNode != nullptr) {  // Check each node in linked list
+			if (currNode->isColliding(ListNode::Head)) {
+				m_isAlive = false;
+				break;
+			}
+			currNode = currNode->m_next;
+		}
+	}
+
+	if (m_addNodes > 0) {  // Allow snake to grow
+		if (ListNode::Head != nullptr) {  // Can only grow if there is an existing node
+			addNode(ListNode::Head->m_pos, ListNode::Head->m_shape.getRotation());
+			m_addNodes--;
+		}
+		else
+			m_addNodes = 0;
+	}
+
+	m_pos.x += std::roundf(cos((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Move the head by the velocity
+	m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
+
+	// Screen bounds collision
+	if (m_pos.x < m_screenBounds.left + Size) {  // Left
+		if (m_bounceWall) {
+			m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
+			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+		}
+		else
+			gravity();
+	}
+	else if (m_pos.x > m_screenBounds.left + m_screenBounds.width - Size) {  // Right
+		if (m_bounceWall) {
+			m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
+			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
+		}
+		else
+			gravity();
+	}
+
+	if (m_pos.y < m_screenBounds.top + Size) {  // Top
+		gravity();
+	}
+	else if (m_pos.y > m_screenBounds.top + m_screenBounds.height - Size) {  // Bottom
+		if (m_bounceWall) {
+			m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
+			m_dir = 180 - m_dir;  // Angle to bounce off wall
+		}
+		else
+			gravity();
+	}
+
+	addNode(m_pos, m_dir, false);  // Add new node to head
+	delNode();  // Remove tail node
 }
 
 void Snake::draw(sf::RenderWindow* window) {

@@ -26,13 +26,11 @@ private:
 	static const float TurnMax;  // Maximum turning amount
 	static const float TurnSmoothing;  // Turning speed back to 0 (not pressing)
 	static const unsigned int Gravity;  // Turning speed out of water
-	static const unsigned int Speed;  // Movement speed of the snake (update rate)
 	sf::Vector2u m_screenSize;  // Screen size
 	sf::FloatRect m_screenBounds;  // Screen boundary (tank)
 	sf::Vector2f m_pos{ 0, 0 };  // Position
 	float m_dir{ 0 };  // Direction (rotation)
 	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
-	unsigned int m_updateCount{ 0 };  // Counter for update
 	unsigned int m_addNodes{ 0 };  // Buffer of nodes to add
 	bool m_collideSelf{ true };  // Toggle colliding with itself
 	bool m_bounceWall{ false };  // Toggle bouncing off walls

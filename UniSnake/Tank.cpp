@@ -40,6 +40,10 @@ sf::FloatRect Tank::getRect() {
 	return m_rect;
 }
 
+void Tank::setWaterLevel(unsigned int level) {
+	m_water.setPosition({ m_water.getPosition().x, m_tankLeft.getPosition().y + (100 - level)});
+}
+
 void Tank::drawTank(sf::RenderWindow* window) {
 	window->draw(m_tankLeft);
 	window->draw(m_tankRight);

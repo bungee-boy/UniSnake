@@ -1,6 +1,8 @@
 #include <iostream>
 #include "InputManager.h"
 
+const float InputManager::DeadZone{ 20.0f };
+
 void InputManager::addInterface(IInput* interface) {
 	m_interfaces.push_back(interface);
 }
@@ -55,12 +57,14 @@ void InputManager::update() {
 	}
 	else {  // P1 Controller
 		data = sf::Joystick::getAxisPosition(m_p1ControllerIndex, sf::Joystick::X);
-		if (data < 0.0f)
+		if (data < -DeadZone)
 			action = InputActions::eP1Left;
-		else if (data > 0.0f)
+		else if (data > DeadZone)
 			action = InputActions::eP1Right;
+		if (action == InputActions::eNone)
+			data = 0.0f;
 	}
-	
+
 	if (action != InputActions::eNone) {  // Update entities
 		std::cout << static_cast<int>(action) << ' ' << data << ' ' << m_p1ControllerIndex << '\n';
 		for (IInput* interface : m_interfaces)

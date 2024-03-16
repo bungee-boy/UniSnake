@@ -12,6 +12,7 @@ public:
 	bool setP2Controller(const int& joystickIndex);
 	void update();
 private:
+	static const float DeadZone;
 	std::vector<IInput*> m_interfaces;
 	int m_p1ControllerIndex{ -1 };
 	int m_p2ControllerIndex{ -1 };

@@ -7,6 +7,7 @@ public:
 	Tank(const sf::FloatRect rect);
 	sf::FloatRect getRect();
 	sf::FloatRect getWaterRect();
+	void setWaterLevel(unsigned int level);
 	void drawTank(sf::RenderWindow* window);
 	void drawWater(sf::RenderWindow* window);
 private:
@@ -15,7 +16,7 @@ private:
 	static const sf::Color TankInnerCol;
 	static const sf::Color TankOuterCol;
 	sf::FloatRect m_rect;
-	unsigned int m_waterLevel{ 0 };
+	unsigned int m_waterLevel{ 100 };
 	sf::RectangleShape m_tankLeft;
 	sf::RectangleShape m_tankRight;
 	sf::RectangleShape m_tankBottom;
