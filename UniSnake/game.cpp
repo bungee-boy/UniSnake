@@ -8,7 +8,7 @@ Game::Game() {
 	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
-	m_tank = new Tank({ 80, 60, static_cast<float>(m_screenSize.x - 200), static_cast<float>(m_screenSize.y - 200) });
+	m_tank = new Tank({ 50, 50, static_cast<float>(m_screenSize.x - 500), static_cast<float>(m_screenSize.y - 100) });
 
 	Fruit::loadTextures();  // Load fruit textures
 }
@@ -22,6 +22,8 @@ void Game::begin() {
 }
 
 void Game::startGame() {
+	sf::Clock secondClock;
+	float waterLevel{ 100.0f };
 	while (m_window->isOpen() && m_snakes.size() > 0) {
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {
@@ -50,6 +52,15 @@ void Game::startGame() {
 					delFruit(m_fruits[i]);
 			}
 		}
+
+		if (secondClock.getElapsedTime() >= sf::milliseconds(100.0f)) {
+			waterLevel -= 0.5f;
+			if (waterLevel < 10.0f)
+				waterLevel = 100.0f;
+			std::cout << waterLevel << '\n';
+			m_tank->setWaterLevel(waterLevel);
+			secondClock.restart();
+		}
 		
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
 
@@ -61,8 +72,8 @@ void Game::startGame() {
 }
 
 void Game::addSnake() {
-	sf::FloatRect tankRect = m_tank->getWaterRect();
-	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, tankRect, m_screenSize, false, true);
+	sf::FloatRect tankRect = *m_tank->getRect();
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, m_tank->getRect(), m_screenSize, false, true);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
@@ -78,7 +89,7 @@ void Game::delSnake(Snake* obj) {
 }
 
 void Game::addFruit() {
-	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, m_tank->getWaterRect(), CollisionType::eCircle);
+	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, *m_tank->getRect(), CollisionType::eCircle);
 	m_collision.addInterface(tempFruit);
 	m_draw.addInterface(tempFruit);
 	m_fruits.push_back(tempFruit);

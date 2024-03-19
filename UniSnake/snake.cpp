@@ -2,7 +2,7 @@
 
 const float Snake::Pi = 3.14159265359f;
 const float Snake::Size = 10.0f;
-const float Snake::NodeGap = 1.2f;
+const float Snake::NodeGap = 1.1f;
 const float Snake::TurnSpeed = 3;
 const float Snake::TurnMax = 15;
 const float Snake::TurnSmoothing = 4;
@@ -65,10 +65,10 @@ void Snake::ListNode::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
-Snake::Snake(const sf::Vector2f startPos, const sf::FloatRect screenBounds, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
+Snake::Snake(const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
 	setCollisionType(CollisionType::eCircle);
 	m_screenSize = screenSize;  // Set screen size
-	m_screenBounds = screenBounds;  // Set screen bounds
+	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
 	m_bounceWall = bounceOffWalls;  // Set bounce off walls
 	if (!ListNode::Texture.loadFromFile("textures\\snake.png"))  // Load texture
@@ -89,7 +89,7 @@ Snake::~Snake() {
 }
 
 void Snake::handleInput(InputActions action, float dataValue) {
-	if (m_screenBounds.contains(m_pos)) {  // Limit to only in water
+	if (m_waterRect->contains(m_pos)) {  // Limit to only in water
 		switch (action) {
 		case InputActions::eP1Left:  // Turn left
 			if (dataValue == 0.0f) {  // Keyboard
@@ -204,29 +204,29 @@ void Snake::update() {
 	m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
 
 	// Screen bounds collision
-	if (m_pos.x < m_screenBounds.left + Size) {  // Left
+	if (m_pos.x < m_waterRect->left + Size) {  // Left
 		if (m_bounceWall) {
-			m_pos.x = m_screenBounds.left + Size;  // Snap back to inside the wall
+			m_pos.x = m_waterRect->left + Size;  // Snap back to inside the wall
 			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
 		}
 		else
 			gravity();
 	}
-	else if (m_pos.x > m_screenBounds.left + m_screenBounds.width - Size) {  // Right
+	else if (m_pos.x > m_waterRect->left + m_waterRect->width - Size) {  // Right
 		if (m_bounceWall) {
-			m_pos.x = m_screenBounds.left + m_screenBounds.width - Size;  // Snap back to inside the wall
+			m_pos.x = m_waterRect->left + m_waterRect->width - Size;  // Snap back to inside the wall
 			m_dir = 90 - (m_dir - 270);  // Angle to bounce off wall
 		}
 		else
 			gravity();
 	}
 
-	if (m_pos.y < m_screenBounds.top + Size) {  // Top
+	if (m_pos.y < m_waterRect->top + Size) {  // Top
 		gravity();
 	}
-	else if (m_pos.y > m_screenBounds.top + m_screenBounds.height - Size) {  // Bottom
+	else if (m_pos.y > m_waterRect->top + m_waterRect->height - Size) {  // Bottom
 		if (m_bounceWall) {
-			m_pos.y = m_screenBounds.top + m_screenBounds.height - Size;  // Snap back to inside the wall
+			m_pos.y = m_waterRect->top + m_waterRect->height - Size;  // Snap back to inside the wall
 			m_dir = 180 - m_dir;  // Angle to bounce off wall
 		}
 		else
@@ -306,10 +306,10 @@ void Snake::delNode(const bool del_tail) {
 }
 
 void Snake::gravity() {
-	if (m_dir > 180 + Gravity)  // Facing left
+	if (m_dir > 180)  // Facing left
 		m_dir -= Gravity;  // Turn down
-	else if (m_dir < 180 - Gravity) // Facing right
+	else if (m_dir < 180) // Facing right
 		m_dir += Gravity;  // Turn down
-	else
-		m_dir = 180;
+	else if (m_dir != 180 && m_dir != -180)  // Facing down
+		m_dir = (rand() % 2) ? 180 : -180;
 }

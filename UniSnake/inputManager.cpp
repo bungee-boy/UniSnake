@@ -66,7 +66,6 @@ void InputManager::update() {
 	}
 
 	if (action != InputActions::eNone) {  // Update entities
-		std::cout << static_cast<int>(action) << ' ' << data << ' ' << m_p1ControllerIndex << '\n';
 		for (IInput* interface : m_interfaces)
 				interface->handleInput(action, data);
 	}

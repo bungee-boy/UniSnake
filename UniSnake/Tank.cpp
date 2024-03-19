@@ -27,21 +27,28 @@ Tank::Tank(const sf::FloatRect rect) {
 	m_tankRight.setPosition({ m_rect.left + m_rect.width - TankWidth, m_rect.top });  // Right
 	m_tankBottom.setPosition({ m_rect.left, m_rect.top + m_rect.height - TankWidth });  // Bottom
 
-	m_water.setPosition({ m_rect.left + TankWidth, m_rect.top });
+	m_water.setPosition({ m_rect.left + TankWidth, m_rect.top });  // Water
 	m_water.setSize({ m_rect.width - (TankWidth * 2), m_rect.height - TankWidth});
 	m_water.setFillColor({ 50, 50, 255, 50 });
+	m_rect = sf::FloatRect({ m_rect.left + TankWidth - 2, m_rect.top, m_rect.width - (TankWidth * 2) + 4, m_rect.height - TankWidth + 2 });  // Match collision to water
 }
 
-sf::FloatRect Tank::getWaterRect() {
-	return m_water.getGlobalBounds();
+sf::FloatRect* Tank::getRect() {
+	return &m_rect;
 }
 
-sf::FloatRect Tank::getRect() {
-	return m_rect;
-}
+void Tank::setWaterLevel(float level) {
+	if (level > 100) {
+		level = 100;
+		std::cerr << "Error -> Tank::setWaterLevel(level): Water level was out of range! (level > 100)";
+	}
+	m_water.setPosition({ m_water.getPosition().x, m_tankLeft.getPosition().y + (m_tankLeft.getSize().y * ((100 - level) / 100))});
+	m_water.setSize({ m_water.getSize().x, m_tankLeft.getSize().y * (level / 100) - TankWidth });
+	if (m_water.getSize().y < 0)
+		m_water.setSize({ m_water.getSize().x, 0 });
 
-void Tank::setWaterLevel(unsigned int level) {
-	m_water.setPosition({ m_water.getPosition().x, m_tankLeft.getPosition().y + (100 - level)});
+	m_rect.top = m_water.getPosition().y;  // Ensure collision rect matches visual rect
+	m_rect.height = m_water.getSize().y;
 }
 
 void Tank::drawTank(sf::RenderWindow* window) {

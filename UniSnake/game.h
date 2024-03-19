@@ -22,7 +22,7 @@ private:
 	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
 	const sf::Vector2u m_screenSize{ 1280, 720 };  // Screen size
 	unsigned int m_fps{ 60 };  // Frames Per Second (FPS)
-	unsigned int m_tps{ 30 };  // Ticks Per Second (TPS)
+	unsigned int m_tps{ 25 };  // Ticks Per Second (TPS)
 	sf::RenderWindow* m_window;  // Window (screen)
 	sf::Clock m_ticks;  // Game ticks
 	DrawManager m_draw;  // Draw manager

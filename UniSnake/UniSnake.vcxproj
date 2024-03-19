@@ -135,9 +135,11 @@
     <ClCompile Include="Fruit.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="Tank.cpp" />
+    <ClCompile Include="Ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionManager.h" />
@@ -148,9 +150,11 @@
     <ClInclude Include="IDraw.h" />
     <ClInclude Include="IInput.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="LinkedList.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="Tank.h" />
+    <ClInclude Include="Ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

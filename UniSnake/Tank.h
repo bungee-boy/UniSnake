@@ -5,9 +5,8 @@
 class Tank {
 public:
 	Tank(const sf::FloatRect rect);
-	sf::FloatRect getRect();
-	sf::FloatRect getWaterRect();
-	void setWaterLevel(unsigned int level);
+	sf::FloatRect* getRect();
+	void setWaterLevel(float level);
 	void drawTank(sf::RenderWindow* window);
 	void drawWater(sf::RenderWindow* window);
 private:
