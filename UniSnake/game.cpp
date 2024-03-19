@@ -53,7 +53,7 @@ void Game::startGame() {
 			}
 		}
 
-		if (secondClock.getElapsedTime() >= sf::milliseconds(100.0f)) {
+		if (secondClock.getElapsedTime() >= sf::milliseconds(100)) {
 			waterLevel -= 0.5f;
 			if (waterLevel < 10.0f)
 				waterLevel = 100.0f;

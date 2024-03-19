@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "LinkedList.h"
 #include "IInput.h"
 #include "ICollision.h"
 #include "IDraw.h"
@@ -8,14 +9,13 @@ class Snake : public IInput, public ICollision, public IDraw {
 public:
 	bool m_isAlive{ true };
 	Snake(const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);
-	~Snake();
 	void handleInput(InputActions action, float dataValue = 0) override;  // From iInput.h
-	sf::Vector2f getCircleCenter();  // From iCollision.h
-	sf::FloatRect getRect();  // From iCollision.h
-	float getRadius();  // From iCollision.h
-	bool isColliding(ICollision* other) override;  // From iCollision.h
-	void collideSnake();  // From iCollision.h
-	void collideFruit(int value);  // From iCollision.h
+	sf::Vector2f getCircleCenter() override;  // From iCollision.h
+	sf::FloatRect getRect() override;  // From iCollision.h
+	float getRadius() override;  // From iCollision.h
+	bool isColliding(ICollision& other) override;  // From iCollision.h
+	void collideSnake() override;  // From iCollision.h
+	void collideFruit(int value) override;  // From iCollision.h
 	void update();
 	void draw(sf::RenderWindow* window) override;  // From iDraw.h
 private:
@@ -35,31 +35,25 @@ private:
 	bool m_collideSelf{ true };  // Toggle colliding with itself
 	bool m_bounceWall{ false };  // Toggle bouncing off walls
 
-	class ListNode : public ICollision {  // Node for linked list
+	class Body : public ICollision {  // Node for linked list
 	public:
-		ListNode(sf::Vector2f pos, float direction, Snake* parent);
+		Body(sf::Vector2f pos, float direction, Snake* parent);
 		sf::Vector2f getCircleCenter() override;  // From iCollision.h
 		sf::FloatRect getRect() override;  // From iCollision.h
 		float getRadius() override;  // From iCollision.h
-		bool isColliding(ICollision* other) override;  // From iCollision.h
+		bool isColliding(ICollision& other) override;  // From iCollision.h
 		void collideSnake() override;  // From iCollision.h
 		void collideFruit(int value) override;  // From iCollision.h
 		void draw(sf::RenderWindow* window);
 	protected:
 		friend class Snake;  // Allow snake to access protected members
 		static sf::Texture Texture;  // Texture of all nodes
-		static ListNode* Head;  // Head of linked list
-		static ListNode* Tail;  // Tail of linked list
-		ListNode* m_prev{ nullptr };  // Previous node in linked list
-		ListNode* m_next{ nullptr };  // Next node in linked list
 		Snake* m_parent{ nullptr };  // Ptr to parent snake (for collision)
 	private:
 		sf::Vector2f m_pos{ 0, 0 };  // Node position
 		sf::CircleShape m_shape;  // Drawable surface
 	};
-
-	void addNode(const sf::Vector2f pos, const float direction, const bool to_tail = true);  // Add a new node to linked list
-	void delNode(const bool del_tail = true);  // Delete the tail node
+	LinkedList<Body> m_body;
 	void gravity();  // Apply gravity
 };
 

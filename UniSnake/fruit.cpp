@@ -70,15 +70,15 @@ float Fruit::getRadius() {
 	return m_sprite.getLocalBounds().width / 2;
 }
 
-bool Fruit::isColliding(ICollision* other) {
-	switch (other->getCollisionType()) {
+bool Fruit::isColliding(ICollision& other) {
+	switch (other.getCollisionType()) {
 	case CollisionType::eRect:
 		break;
 	case CollisionType::eCircle: {
-		sf::Vector2f offset = getCircleCenter() - other->getCircleCenter();
+		sf::Vector2f offset = getCircleCenter() - other.getCircleCenter();
 		float distance = (offset.x * offset.x) + (offset.y * offset.y);  // Offset ^ 2
 
-		float radius = getRadius() + other->getRadius();
+		float radius = getRadius() + other.getRadius();
 		radius *= radius;  // Radius ^ 2
 
 		if (distance <= radius)

@@ -8,11 +8,9 @@ const float Snake::TurnMax = 15;
 const float Snake::TurnSmoothing = 4;
 const unsigned int Snake::Gravity = 10;
 
-Snake::ListNode* Snake::ListNode::Head = nullptr;  // Head of linked list
-Snake::ListNode* Snake::ListNode::Tail = nullptr;  // Tail of linked list
-sf::Texture Snake::ListNode::Texture = sf::Texture();
+sf::Texture Snake::Body::Texture = sf::Texture();
 
-Snake::ListNode::ListNode(sf::Vector2f pos, float direction, Snake* parent) {
+Snake::Body::Body(sf::Vector2f pos, float direction, Snake* parent) {
 	setCollisionType(CollisionType::eCircle);
 	m_parent = parent;
 	m_shape.setRadius(Size);
@@ -23,27 +21,27 @@ Snake::ListNode::ListNode(sf::Vector2f pos, float direction, Snake* parent) {
 	m_shape.setPosition(m_pos);
 }
 
-sf::Vector2f Snake::ListNode::getCircleCenter() {
+sf::Vector2f Snake::Body::getCircleCenter() {
 	return m_pos;
 }
 
-sf::FloatRect Snake::ListNode::getRect() {
+sf::FloatRect Snake::Body::getRect() {
 	return m_shape.getGlobalBounds();
 }
 
-float Snake::ListNode::getRadius() {
+float Snake::Body::getRadius() {
 	return Size;
 }
 
-bool Snake::ListNode::isColliding(ICollision* other) {
-	switch (other->getCollisionType()) {
+bool Snake::Body::isColliding(ICollision& other) {
+	switch (other.getCollisionType()) {
 	case CollisionType::eRect:
 		break;
 	case CollisionType::eCircle: {
-		sf::Vector2f offset = getCircleCenter() - other->getCircleCenter();
+		sf::Vector2f offset = getCircleCenter() - other.getCircleCenter();
 		float distance = (offset.x * offset.x) + (offset.y * offset.y);  // Offset ^ 2
 
-		float radius = getRadius() + other->getRadius();
+		float radius = getRadius() + other.getRadius();
 		radius *= radius;  // Radius ^ 2
 
 		if (distance <= radius)
@@ -53,15 +51,15 @@ bool Snake::ListNode::isColliding(ICollision* other) {
 	return false;
 }
 
-void Snake::ListNode::collideSnake() {
-	std::cout << "Node -> collideSnake()\n";
+void Snake::Body::collideSnake() {
+	std::cout << "Snake::Body -> collideSnake()\n";
 }
 
-void Snake::ListNode::collideFruit(int value) {
-	std::cout << "Node -> collideFruit(" << value << ")\n";
+void Snake::Body::collideFruit(int value) {
+	std::cout << "Snake::Body -> collideFruit(" << value << ")\n";
 }
 
-void Snake::ListNode::draw(sf::RenderWindow* window) {
+void Snake::Body::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
@@ -71,21 +69,16 @@ Snake::Snake(const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Ve
 	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
 	m_bounceWall = bounceOffWalls;  // Set bounce off walls
-	if (!ListNode::Texture.loadFromFile("textures\\snake.png"))  // Load texture
+	if (!Body::Texture.loadFromFile("textures\\snake.png"))  // Load texture
 		std::cerr << "Failed to load snake.png" << '\n';
-	ListNode::Texture.setSmooth(true);
+	Body::Texture.setSmooth(true);
 	m_pos = startPos;
 	m_addNodes = length;
-	for (int i{ 0 }; i < length; i++) {  // Init linked list
-		addNode(m_pos, m_dir);
+	for (int i{ 0 }; i < length; i++) {  // Fill linked list
+		m_body.push_back(Body(m_pos, m_dir, this));
 		m_pos.y += Size + NodeGap;
 	}
 	m_pos = startPos;
-}
-
-Snake::~Snake() {
-	while (ListNode::Head != nullptr)  // Delete all nodes (memory leak if not)
-		delNode();
 }
 
 void Snake::handleInput(InputActions action, float dataValue) {
@@ -135,29 +128,27 @@ void Snake::handleInput(InputActions action, float dataValue) {
 }
 
 sf::Vector2f Snake::getCircleCenter() { 
-	if (ListNode::Head == nullptr)
+	if (m_body.getHead() == nullptr)
 		throw "Head is nullptr, cannot return center!";
-	return ListNode::Head->getCircleCenter();
+	return m_body.getHead()->data.getCircleCenter();
 }
 
 sf::FloatRect Snake::getRect() {
-	if (ListNode::Head == nullptr)
+	if (m_body.getHead() == nullptr)
 		throw "Head is nullptr, cannot return rect!";
-	return ListNode::Head->getRect();
+	return m_body.getHead()->data.getRect();
 }
 
 float Snake::getRadius() {
 	return Size;
 }
 
-bool Snake::isColliding(ICollision* other) {
-	if (other != nullptr) {
-		ListNode* currNode = ListNode::Head;
-		while (currNode != nullptr) {  // Check each node in linked list
-			if (currNode->isColliding(other))
-				return true;
-			currNode = currNode->m_next;
-		}
+bool Snake::isColliding(ICollision& other) {
+	ListNode<Body>* currNode = m_body.getHead();
+	while (currNode != nullptr) {  // Check each node in linked list
+		if (currNode->data.isColliding(other))
+			return true;
+		currNode = currNode->next;
 	}
 	
 	return false;
@@ -172,28 +163,28 @@ void Snake::collideFruit(int value) {
 }
 
 void Snake::update() {
-	if (ListNode::Tail->getCircleCenter().x < 0 || ListNode::Tail->getCircleCenter().x > m_screenSize.x ||
-		ListNode::Tail->getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
+	if (m_body.getTail()->data.getCircleCenter().x < 0 || m_body.getTail()->data.getCircleCenter().x > m_screenSize.x ||
+		m_body.getTail()->data.getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
 		m_isAlive = false;  // Mark self for deletion
 		return;  // Stop all updates
 	}
 		
 	if (m_collideSelf) {  // Check collision with self
-		ListNode* currNode = ListNode::Head->m_next;  // start at head + 1
+		ListNode<Body>* currNode = m_body.getHead()->next;  // start at head + 1
 		if (currNode != nullptr)
-			currNode = currNode->m_next;
+			currNode = currNode->next;
 		while (currNode != nullptr) {  // Check each node in linked list
-			if (currNode->isColliding(ListNode::Head)) {
+			if (currNode->data.isColliding(m_body.getHead()->data)) {
 				m_isAlive = false;
 				break;
 			}
-			currNode = currNode->m_next;
+			currNode = currNode->next;
 		}
 	}
 
 	if (m_addNodes > 0) {  // Allow snake to grow
-		if (ListNode::Head != nullptr) {  // Can only grow if there is an existing node
-			addNode(ListNode::Head->m_pos, ListNode::Head->m_shape.getRotation());
+		if (m_body.getHead() != nullptr) {  // Can only grow if there is an existing node
+			m_body.push_back(Body(m_body.getHead()->data.m_pos, m_body.getHead()->data.m_shape.getRotation(), this));
 			m_addNodes--;
 		}
 		else
@@ -233,83 +224,23 @@ void Snake::update() {
 			gravity();
 	}
 
-	addNode(m_pos, m_dir, false);  // Add new node to head
-	delNode();  // Remove tail node
+	m_body.push_back(Body(m_pos, m_dir, this));  // Add new node to head
+	m_body.pop_back();  // Remove tail node
 }
 
 void Snake::draw(sf::RenderWindow* window) {
-	ListNode* currNode = ListNode::Tail;
+	ListNode<Body>* currNode = m_body.getTail();  // Start at tail
 	while (currNode != nullptr) {  // Draw each node in linked list (in reverse so head on top)
-		currNode->draw(window);
-		currNode = currNode->m_prev;
-	}
-}
-
-void Snake::addNode(const sf::Vector2f pos, const float direction, const bool to_tail) {  // Initialise a node
-	ListNode* newNode = new ListNode(pos, direction, this);  // Create new node
-
-	if (ListNode::Head == nullptr)  // If list is empty
-		ListNode::Head = newNode;  // Set to head
-	else {
-		if (to_tail) {  // Add to tail
-			if (ListNode::Tail == nullptr) {  // If tail is none
-				ListNode::Head->m_next = newNode;  // Point head to tail (H -> T)
-				newNode->m_prev = ListNode::Head;  // Point tail to head (H <- T)
-				ListNode::Tail = newNode;  // Set tail
-			}
-			else {  // Tail exists
-				ListNode::Tail->m_next = newNode;  // Point tail to new (T -> N)
-				newNode->m_prev = ListNode::Tail;  // Point new to tail (T <- N)
-				ListNode::Tail = newNode;  // Set tail to new
-			}
-		}
-		else {  // Add to head
-			newNode->m_next = ListNode::Head;  // Point new to head (N -> H)
-			ListNode::Head->m_prev = newNode;  // Point head to new (N <- H)
-			ListNode::Head = newNode;  // Set head to new
-		}
-	}
-}
-
-void Snake::delNode(const bool del_tail) {
-	if (del_tail) {  // Remove from tail
-		if (ListNode::Tail == nullptr && ListNode::Head != nullptr) {  // If only head
-			delete ListNode::Head;  // Delete head
-			ListNode::Head = nullptr;
-		}
-		else if (ListNode::Tail != nullptr) {  // If tail exists
-			ListNode::Tail = ListNode::Tail->m_prev;  // Remove tail
-			delete ListNode::Tail->m_next;
-			ListNode::Tail->m_next = nullptr;
-			if (ListNode::Tail == ListNode::Head)  // If head and tail are same
-				ListNode::Tail = nullptr;  // Don't delete but set tail to null
-		}
-		else
-			std::cerr << "WARN -> Snake::delNode(true) called when list is empty!\n";
-	}
-	else {  // Remove from head
-		if (ListNode::Head == nullptr && ListNode::Tail != nullptr) {  // If only tail (should never happen!)
-			delete ListNode::Tail;
-			ListNode::Tail = nullptr;
-			std::cerr << "WARN -> Snake::delNode(false) ListNode::Head was nullptr when ListNode::Tail was not!\n";
-		}
-		else if (ListNode::Head != nullptr) {  // If head exists
-			ListNode::Head = ListNode::Head->m_next;
-			delete ListNode::Head->m_prev;
-			ListNode::Head->m_prev = nullptr;
-			if (ListNode::Head == ListNode::Tail)  // If head and tail are same
-				ListNode::Tail = nullptr;  // Don't delete but set tail to null
-		}
-		else
-			std::cerr << "WARN -> Snake::delNode(false) called when list is empty!\n";
+		currNode->data.draw(window);
+		currNode = currNode->prev;
 	}
 }
 
 void Snake::gravity() {
-	if (m_dir > 180)  // Facing left
+	if (m_dir > 180.0f)  // Facing left
 		m_dir -= Gravity;  // Turn down
-	else if (m_dir < 180) // Facing right
+	else if (m_dir < 180.0f) // Facing right
 		m_dir += Gravity;  // Turn down
-	else if (m_dir != 180 && m_dir != -180)  // Facing down
-		m_dir = (rand() % 2) ? 180 : -180;
+	else if (m_dir != 180.0f && m_dir != -180.0f)  // Facing down
+		m_dir = (rand() % 2) ? 180.0f : -180.0f;
 }

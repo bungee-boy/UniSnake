@@ -13,7 +13,7 @@ public:
 	virtual sf::Vector2f getCircleCenter() = 0;
 	virtual sf::FloatRect getRect() = 0;
 	virtual float getRadius() = 0;
-	virtual bool isColliding(ICollision* other) = 0;
+	virtual bool isColliding(ICollision& other) = 0;
 	virtual void collideSnake() = 0;
 	virtual void collideFruit(int value) = 0;
 private:

@@ -5,32 +5,40 @@ template <typename T> LinkedList<T>::~LinkedList() {
 		pop_back();
 }
 
+template <typename T> ListNode<T>* LinkedList<T>::getHead() {
+	return m_head;  // Return head ptr
+}
+
+template <typename T> ListNode<T>* LinkedList<T>::getTail() {
+	return m_tail;  // Return tail ptr
+}
+
 template <typename T> void LinkedList<T>::push_front(const T& data) {
-	ListNode* newNode = new ListNode{ nullptr, nullptr, data };  // Create new node
+	ListNode<T>* newNode = new ListNode<T>{ nullptr, nullptr, data };  // Create new node
 
 	if (m_head == nullptr)  // If list is empty
 		m_head = newNode;  // Set to head
 	else {  // Add to head
-		newNode->m_next = m_head;  // Point new to head (N -> H)
-		m_head->m_prev = newNode;  // Point head to new (N <- H)
+		newNode->next = m_head;  // Point new to head (N -> H)
+		m_head->prev = newNode;  // Point head to new (N <- H)
 		m_head = newNode;  // Set head to new
 	}
 }
 
 template <typename T> void LinkedList<T>::push_back(const T& data) {
-	ListNode* newNode = new ListNode{ nullptr, nullptr, data };  // Create new node
+	ListNode<T>* newNode = new ListNode<T>{ nullptr, nullptr, data };  // Create new node
 
 	if (m_head == nullptr)  // If list is empty
 		m_head = newNode;  // Set to head
 	else {  // Add to tail
 		if (m_tail == nullptr) {  // If tail is none
-			m_head->m_next = newNode;  // Point head to tail (H -> T)
-			newNode->m_prev = m_head;  // Point tail to head (H <- T)
+			m_head->next = newNode;  // Point head to tail (H -> T)
+			newNode->prev = m_head;  // Point tail to head (H <- T)
 			m_tail = newNode;  // Set tail
 		}
 		else {  // Tail exists
-			m_tail->m_next = newNode;  // Point tail to new (T -> N)
-			newNode->m_prev = m_tail;  // Point new to tail (T <- N)
+			m_tail->next = newNode;  // Point tail to new (T -> N)
+			newNode->prev = m_tail;  // Point new to tail (T <- N)
 			m_tail = newNode;  // Set tail to new
 		}
 	}
@@ -43,9 +51,9 @@ template <typename T> void LinkedList<T>::pop_front() {
 		std::cerr << "WARN -> LinkedList::pop_front() Head was nullptr while Tail was not!\n";
 	}
 	else if (m_head != nullptr) {  // If head exists
-		m_head = m_head->m_next;
-		delete m_head->m_prev;
-		m_head->m_prev = nullptr;
+		m_head = m_head->next;
+		delete m_head->prev;
+		m_head->prev = nullptr;
 		if (m_head == m_tail)  // If head and tail are same
 			m_tail = nullptr;  // Don't delete but set tail to null
 	}
@@ -59,9 +67,9 @@ template <typename T> void LinkedList<T>::pop_back() {
 		m_head = nullptr;
 	}
 	else if (m_tail != nullptr) {  // If tail exists
-		m_tail = m_tail->m_prev;  // Remove tail
-		delete m_tail->m_next;
-		m_tail->m_next = nullptr;
+		m_tail = m_tail->prev;  // Remove tail
+		delete m_tail->next;
+		m_tail->next = nullptr;
 		if (m_tail == m_head)  // If head and tail are same
 			m_tail = nullptr;  // Don't delete but set tail to null
 	}

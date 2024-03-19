@@ -11,12 +11,12 @@ public:
 	static void loadTextures();  // Load textures
 	void move(float x = 0, float y = 0);  // Shift the fruit by an amount
 	int getValue();  // Return m_value
-	sf::FloatRect getRect();  // From iCollision.h
-	float getRadius();  // From iCollision.h
-	sf::Vector2f getCircleCenter();  // From iCollision.h
-	bool isColliding(ICollision* other) override;  // From iCollision.h
-	void collideSnake();  // From iCollision.h
-	void collideFruit(int value);  // From iCollision.h
+	sf::FloatRect getRect() override;  // From iCollision.h
+	float getRadius() override;  // From iCollision.h
+	sf::Vector2f getCircleCenter() override;  // From iCollision.h
+	bool isColliding(ICollision& other) override;  // From iCollision.h
+	void collideSnake() override;  // From iCollision.h
+	void collideFruit(int value) override;  // From iCollision.h
 	void draw(sf::RenderWindow* window) override;  // From iDraw.h
 private:
 	static sf::Texture TextureTwo;
