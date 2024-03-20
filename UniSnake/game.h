@@ -4,6 +4,7 @@
 #include "InputManager.h"
 #include "DrawManager.h"
 #include "CollisionManager.h"
+#include "Ui.h"
 #include "Tank.h"
 #include "Snake.h"
 #include "Fruit.h"
@@ -28,6 +29,7 @@ private:
 	DrawManager m_draw;  // Draw manager
 	InputManager m_input;  // Input manager
 	CollisionManager m_collision;  // Collision manager
+	Ui m_ui;  // User Interface
 	Tank* m_tank;  // Tank
 	std::vector<Snake*> m_snakes;  // Vector of snakes
 	std::vector<Fruit*> m_fruits;  // Vector of foods

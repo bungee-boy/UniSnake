@@ -5,7 +5,7 @@ Game::Game() {
 	sf::ContextSettings settings;  // Setup window settings
 	settings.antialiasingLevel = 8;
 
-	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake", sf::Style::Default, settings);  // Create window
+	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake - D3169324", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
 	m_tank = new Tank({ 50, 50, static_cast<float>(m_screenSize.x - 500), static_cast<float>(m_screenSize.y - 100) });
@@ -73,7 +73,7 @@ void Game::startGame() {
 
 void Game::addSnake() {
 	sf::FloatRect tankRect = *m_tank->getRect();
-	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, m_tank->getRect(), m_screenSize, false, true);
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, m_tank->getRect(), m_screenSize, true, false);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);

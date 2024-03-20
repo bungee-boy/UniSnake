@@ -224,7 +224,7 @@ void Snake::update() {
 			gravity();
 	}
 
-	m_body.push_back(Body(m_pos, m_dir, this));  // Add new node to head
+	m_body.push_front(Body(m_pos, m_dir, this));  // Add new node to head
 	m_body.pop_back();  // Remove tail node
 }
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include "ICollision.h"
+#include "Tank.h"
 #include "Snake.h"
 #include "Fruit.h"
 
