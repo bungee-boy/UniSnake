@@ -48,8 +48,11 @@
     <ClCompile Include="Ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LinkedList.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="IAnimate.h">
+      <Filter>Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimateManager.cpp">
+      <Filter>Manager Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="LinkedList.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimateManager.h">
+      <Filter>Manager Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

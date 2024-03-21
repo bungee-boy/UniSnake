@@ -11,16 +11,16 @@ enum class GameState {
 class Ui {
 public:
 	bool loadFont(std::string fontName);
-	void addText(std::string text, std::string fontName, sf::Vector2f pos, bool center = false);
+	void addText(const std::string text, const std::string fontName, const sf::Vector2f pos, const bool center = false, const unsigned int size = 30);
+	void clearText();
+	void addRect(const sf::Vector2f pos, const sf::Vector2f size, const sf::Color fillColour, const sf::Color outlineColour = { 0, 0, 0, 0 }, const float thickness = 0.0f);
+	void clearRect();
 	void update();
 	void draw(sf::RenderWindow* window);
 private:
 	GameState m_gameState{ GameState::eMenu };
 	std::map<std::string, sf::Font> m_fonts;
-	struct TextData {
-		sf::Vector2f pos;
-		sf::Text text;
-	};
-	LinkedList<TextData> m_textList;
+	LinkedList<sf::Text*> m_textList;
+	LinkedList<sf::RectangleShape*> m_rectList;
 };
 

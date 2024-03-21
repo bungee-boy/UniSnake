@@ -10,11 +10,14 @@ template <typename T> struct ListNode {  // Linked list node
 template <typename T> class LinkedList {
 public:
 	~LinkedList() {  // Default deconstructor
-		while (m_head != nullptr)  // Cleanup all nodes from memory
-			pop_back();
+		clear();
 	};
-	ListNode<T>* getHead() { return m_head; };  // Get head ptr
-	ListNode<T>* getTail() { return m_tail; };  // Get tail ptr
+	ListNode<T>* getHead() {  // Get head ptr
+		return m_head; 
+	};
+	ListNode<T>* getTail() {  // Get tail ptr
+		return m_tail; 
+	};
 	void push_front(const T& data) {  // Add a new node to head
 		ListNode<T>* newNode = new ListNode<T>{ nullptr, nullptr, data };  // Create new node
 
@@ -74,6 +77,10 @@ public:
 		}
 		else
 			std::cerr << "WARN -> LinkedList::pop_back() called when list is empty!\n";
+	}
+	void clear() {  // Clear whole list
+		while (m_head != nullptr)  // Cleanup all nodes from memory
+			pop_back();
 	}
 private:
 	ListNode<T>* m_head{ nullptr };  // Pointer to head

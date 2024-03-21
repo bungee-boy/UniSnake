@@ -4,6 +4,7 @@ const int Tank::TankWidth{ 8 };
 const int Tank::TankBorder{ 3 };
 const sf::Color Tank::TankInnerCol{ 150, 150, 150, 255 };
 const sf::Color Tank::TankOuterCol{ 50, 50, 50, 255 };
+const sf::Color Tank::WaterCol{ 36, 103, 237, 80 };
 
 Tank::Tank(const sf::FloatRect rect) {
 	m_rect = rect;
@@ -29,7 +30,7 @@ Tank::Tank(const sf::FloatRect rect) {
 
 	m_water.setPosition({ m_rect.left + TankWidth, m_rect.top });  // Water
 	m_water.setSize({ m_rect.width - (TankWidth * 2), m_rect.height - TankWidth});
-	m_water.setFillColor({ 50, 50, 255, 50 });
+	m_water.setFillColor(WaterCol);
 	m_rect = sf::FloatRect({ m_rect.left + TankWidth - 2, m_rect.top, m_rect.width - (TankWidth * 2) + 4, m_rect.height - TankWidth + 2 });  // Match collision to water
 }
 
@@ -40,7 +41,7 @@ sf::FloatRect* Tank::getRect() {
 void Tank::setWaterLevel(float level) {
 	if (level > 100) {
 		level = 100;
-		std::cerr << "Error -> Tank::setWaterLevel(level): Water level was out of range! (level > 100)";
+		std::cerr << "Error -> Tank::setWaterLevel(level): Water level was out of range! (level > 100)\n";
 	}
 	m_water.setPosition({ m_water.getPosition().x, m_tankLeft.getPosition().y + (m_tankLeft.getSize().y * ((100 - level) / 100))});
 	m_water.setSize({ m_water.getSize().x, m_tankLeft.getSize().y * (level / 100) - TankWidth });

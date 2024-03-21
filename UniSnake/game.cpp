@@ -15,6 +15,9 @@ Game::Game() {
 
 void Game::begin() {
 	std::cout << m_input.setP1Controller(0) << '\n';
+	m_ui.addText("This text is centered!", "basic", { m_screenCenter.x, 0 }, true, 30);
+	m_ui.addText("This text is smaller, and not centered", "basic", { m_screenCenter.x, 100 }, false, 15);
+	m_ui.addRect({ 0, 0 }, { 25, 25 }, { 0, 255, 0, 255 });
 	while (m_window->isOpen()) {  // Main loop
 		addSnake();
 		startGame();
@@ -29,14 +32,39 @@ void Game::startGame() {
 		while (m_window->pollEvent(event)) {
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 				m_window->close();  // Quit if window closed or Esc pressed
+			else if (event.type == sf::Event::KeyPressed) {
+				switch (event.key.code) {
+				case sf::Keyboard::Up:  // Manaual water control
+					waterLevel += 0.5f;
+					m_tank->setWaterLevel(waterLevel);
+					break;
+				case sf::Keyboard::Down:
+					waterLevel -= 0.5f;
+					m_tank->setWaterLevel(waterLevel);
+					break;
+				}
+			}
 		}
+
+		//if (secondClock.getElapsedTime() >= sf::milliseconds(100)) {
+		//	waterLevel -= 0.5f;
+		//	if (waterLevel < 10.0f)
+		//		waterLevel = 100.0f;
+		//	//std::cout << waterLevel << '\n';
+		//	m_tank->setWaterLevel(waterLevel);
+		//	secondClock.restart();
+		//}
+
 		if (m_ticks.getElapsedTime() >= sf::seconds(1.0f / m_tps)) {  // Keep update rate independent to FPS
 			m_ticks.restart();
-			if (m_fruits.size() < 5 && rand() % 100 == 0 || m_fruits.size() == 0)  // Ramdomly spawn fruit (unless none then always, max 5)
+			if (m_fruits.size() < 5 && rand() % 80 == 0 || m_fruits.size() == 0)  // Ramdomly spawn fruit (min 1, max 5)
 				addFruit();
 
 			m_input.update();  // Check input keys
 
+			for (int i{ 0 }; i < m_fruits.size(); i++) {  // Update fruit
+				m_fruits[i]->update();
+			}
 			for (int i{ 0 }; i < m_snakes.size(); i++)  // Update snakes
 				m_snakes[i]->update();
 
@@ -50,28 +78,22 @@ void Game::startGame() {
 				if (!m_fruits[i]->m_isAlive)
 					delFruit(m_fruits[i]);
 			}
-		}
 
-		if (secondClock.getElapsedTime() >= sf::milliseconds(100)) {
-			waterLevel -= 0.5f;
-			if (waterLevel < 10.0f)
-				waterLevel = 100.0f;
-			std::cout << waterLevel << '\n';
-			m_tank->setWaterLevel(waterLevel);
-			secondClock.restart();
+			m_ui.update();  // Update UI last
 		}
-		
+		m_ani.update();
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
 		m_draw.update(m_window);  // Draw new frame
 		m_tank->drawTank(m_window);
 		m_tank->drawWater(m_window);
+		m_ui.draw(m_window);
 		m_window->display();
 	}
 }
 
 void Game::addSnake() {
 	sf::FloatRect tankRect = *m_tank->getRect();
-	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, m_tank->getRect(), m_screenSize, true, false);
+	Snake* tempSnake = new Snake({ tankRect.left + tankRect.width / 2, tankRect.top + tankRect.height / 2 }, m_tank->getRect(), m_screenSize, false, true);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
@@ -87,15 +109,17 @@ void Game::delSnake(Snake* obj) {
 }
 
 void Game::addFruit() {
-	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, *m_tank->getRect(), CollisionType::eCircle);
+	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, m_tank->getRect(), CollisionType::eCircle);
 	m_collision.addInterface(tempFruit);
 	m_draw.addInterface(tempFruit);
+	m_ani.addInterface(tempFruit);
 	m_fruits.push_back(tempFruit);
 }
 
 void Game::delFruit(Fruit* obj) {
 	m_collision.removeInterface(obj);
 	m_draw.removeInterface(obj);
+	m_ani.removeInterface(obj);
 	m_fruits.erase(std::find(m_fruits.begin(), m_fruits.end(), obj));
 }
 
