@@ -32,7 +32,6 @@ void Game::startGame() {
 		}
 		if (m_ticks.getElapsedTime() >= sf::seconds(1.0f / m_tps)) {  // Keep update rate independent to FPS
 			m_ticks.restart();
-
 			if (m_fruits.size() < 5 && rand() % 100 == 0 || m_fruits.size() == 0)  // Ramdomly spawn fruit (unless none then always, max 5)
 				addFruit();
 
@@ -63,8 +62,7 @@ void Game::startGame() {
 		}
 		
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
-
-		m_draw.update(m_window);
+		m_draw.update(m_window);  // Draw new frame
 		m_tank->drawTank(m_window);
 		m_tank->drawWater(m_window);
 		m_window->display();
