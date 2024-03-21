@@ -10,11 +10,12 @@ enum class GameState {
 
 class Ui {
 public:
-	void addText(std::string text, sf::Vector2f pos);
+	void loadFont(sf::Font font);
+	void addText(std::string text, sf::Vector2f pos, sf::Color colour);
 	void update();
 private:
 	GameState m_gameState{ GameState::eMenu };
-
+	std::map<std::string, sf::Font> m_fonts;
 	struct TextData {
 		sf::Vector2f pos;
 		sf::Text text;
