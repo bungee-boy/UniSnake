@@ -24,8 +24,8 @@ private:
 	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
 	const sf::Vector2u m_screenSize{ 1280, 720 };  // Screen size
 	const sf::Vector2f m_screenCenter{ static_cast<float>(m_screenSize.x) / 2.0f, static_cast<float>(m_screenSize.y) / 2.0f };  // Screen center
-	unsigned int m_fps{ 60 };  // Frames Per Second (FPS)
-	unsigned int m_tps{ 25 };  // Ticks Per Second (TPS)
+	unsigned int m_fps{ 120 };  // Frames Per Second (FPS)
+	unsigned int m_tps{ 20 };  // Ticks Per Second (TPS)
 	sf::RenderWindow* m_window;  // Window (screen)
 	sf::Clock m_ticks;  // Game ticks
 	AnimateManager m_ani;  // Animation manager

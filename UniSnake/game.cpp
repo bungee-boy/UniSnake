@@ -8,16 +8,13 @@ Game::Game() {
 	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake - D3169324", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
-	m_tank = new Tank({ 50, 50, static_cast<float>(m_screenSize.x - 500), static_cast<float>(m_screenSize.y - 100) });
+	m_tank = new Tank({ 40, 40, static_cast<float>(m_screenSize.x - 330), static_cast<float>(m_screenSize.y - 60) });
 
 	Fruit::loadTextures();  // Load fruit textures
 }
 
 void Game::begin() {
 	std::cout << m_input.setP1Controller(0) << '\n';
-	m_ui.addText("This text is centered!", "basic", { m_screenCenter.x, 0 }, true, 30);
-	m_ui.addText("This text is smaller, and not centered", "basic", { m_screenCenter.x, 100 }, false, 15);
-	m_ui.addRect({ 0, 0 }, { 25, 25 }, { 0, 255, 0, 255 });
 	while (m_window->isOpen()) {  // Main loop
 		addSnake();
 		startGame();
@@ -27,6 +24,11 @@ void Game::begin() {
 void Game::startGame() {
 	sf::Clock secondClock;
 	float waterLevel{ 100.0f };
+
+	m_ui.addText("Score", "basic", { static_cast<float>(m_screenSize.x) - 125, 0}, true, 30, sf::Text::Underlined);
+	m_ui.addLineY({ static_cast<float>(m_screenSize.x) - 250, 0 }, m_screenSize.y);
+	//m_ui.addRectTexture("snake.png", { 0, 0 }, { 100, 100 });
+	
 	while (m_window->isOpen() && m_snakes.size() > 0) {
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {

@@ -3,7 +3,7 @@
 const int Tank::TankWidth{ 8 };
 const int Tank::TankBorder{ 3 };
 const sf::Color Tank::TankInnerCol{ 150, 150, 150, 255 };
-const sf::Color Tank::TankOuterCol{ 50, 50, 50, 255 };
+const sf::Color Tank::TankOuterCol{ 60, 60, 60, 255 };
 const sf::Color Tank::WaterCol{ 36, 103, 237, 80 };
 
 Tank::Tank(const sf::FloatRect rect) {
