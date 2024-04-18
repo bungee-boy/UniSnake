@@ -19,28 +19,30 @@ void Ui::unloadFonts() {
 
 }
 
-void Ui::addText(const std::string txt, const std::string fontName, const sf::Vector2f pos, const bool center, const unsigned int size, const unsigned int style) {
+sf::FloatRect Ui::addText(const std::string txt, const std::string fontName, const sf::Vector2f pos, const bool center, const unsigned int size, const unsigned int style) {
 	if (!m_fonts.count(fontName)) {  // If font is not loaded
 		if (!loadFont(fontName))  // Try to load new font
-			return;  // If fails, return
+			return { 0.0f, 0.0f, 0.0f, 0.0f };  // If fails, return
 	}
 	sf::Text* newText = new sf::Text(txt, m_fonts[fontName], size);  // Create text
 	newText->setPosition({ (center) ? pos.x - newText->getGlobalBounds().width / 2 : pos.x, pos.y});  // Set position (with centering)
 	newText->setStyle(style);
 	m_textList.push_back(newText);  // Add text to list (to be drawn)
+	return newText->getGlobalBounds();
 }
 
 void Ui::clearTexts() {
 	m_textList.clear();
 }
 
-void Ui::addRect(const sf::Vector2f pos, const sf::Vector2f size, const sf::Color fillColour, const sf::Color outlineColour, const float thickness) {
+sf::FloatRect Ui::addRect(const sf::Vector2f pos, const sf::Vector2f size, const sf::Color fillColour, const sf::Color outlineColour, const float thickness) {
 	sf::RectangleShape* newRect = new sf::RectangleShape(size);
 	newRect->setPosition(pos);
 	newRect->setFillColor(fillColour);
 	newRect->setOutlineThickness(thickness);
 	newRect->setOutlineColor(outlineColour);
 	m_rectList.push_back(newRect);
+	return newRect->getGlobalBounds();
 }
 
 sf::FloatRect Ui::addLineX(const sf::Vector2f startPos, const unsigned int xSize) {
@@ -73,7 +75,7 @@ void Ui::unloadTextures() {
 sf::FloatRect Ui::addRectTexture(const std::string texture, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const bool center) {
 	if (!m_textures.count(texture)) {  // If texture is not loaded
 		if (!loadTexture(texture))  // Attempt to load texture
-			return;  // Return if failed
+			return { 0.0f, 0.0f, 0.0f, 0.0f };  // Return if failed
 	}
 
 	sf::RectangleShape* newRect = new sf::RectangleShape(size);
@@ -83,6 +85,7 @@ sf::FloatRect Ui::addRectTexture(const std::string texture, const sf::Vector2f p
 	if (center)
 		newRect->setOrigin(size.x / 2, size.y / 2);
 	m_rectList.push_back(newRect);
+	return newRect->getGlobalBounds();
 }
 
 void Ui::update() {
