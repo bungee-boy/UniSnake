@@ -27,7 +27,7 @@ void Game::startGame() {
 
 	m_ui.addText("Score", "basic", { static_cast<float>(m_screenSize.x) - 125, 0}, true, 30, sf::Text::Underlined);
 	m_ui.addLineY({ static_cast<float>(m_screenSize.x) - 250, 0 }, m_screenSize.y);
-	//m_ui.addRectTexture("snake.png", { 0, 0 }, { 100, 100 });
+	m_ui.addRectTexture("snake.png", { static_cast<float>(m_screenSize.x) - 210, 60 }, { 30, 30 }, 180);
 	
 	while (m_window->isOpen() && m_snakes.size() > 0) {
 		sf::Event event;  // Fetch & process window events

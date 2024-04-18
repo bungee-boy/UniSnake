@@ -43,12 +43,12 @@ void Ui::addRect(const sf::Vector2f pos, const sf::Vector2f size, const sf::Colo
 	m_rectList.push_back(newRect);
 }
 
-void Ui::addLineX(const sf::Vector2f startPos, const unsigned int xSize) {
-	addRect(startPos, { static_cast<float>(xSize), RectWidth }, RectInnerCol, RectOuterCol, -RectBorder);
+sf::FloatRect Ui::addLineX(const sf::Vector2f startPos, const unsigned int xSize) {
+	return addRect(startPos, { static_cast<float>(xSize), RectWidth }, RectInnerCol, RectOuterCol, -RectBorder);
 }
 
-void Ui::addLineY(const sf::Vector2f startPos, const unsigned int ySize) {
-	addRect(startPos, { RectWidth, static_cast<float>(ySize) }, RectInnerCol, RectOuterCol, -RectBorder);
+sf::FloatRect Ui::addLineY(const sf::Vector2f startPos, const unsigned int ySize) {
+	return addRect(startPos, { RectWidth, static_cast<float>(ySize) }, RectInnerCol, RectOuterCol, -RectBorder);
 }
 
 void Ui::clearRects() {
@@ -70,7 +70,7 @@ void Ui::unloadTextures() {
 
 }
 
-void Ui::addRectTexture(const std::string texture, const sf::Vector2f pos, const sf::Vector2f size) {
+sf::FloatRect Ui::addRectTexture(const std::string texture, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const bool center) {
 	if (!m_textures.count(texture)) {  // If texture is not loaded
 		if (!loadTexture(texture))  // Attempt to load texture
 			return;  // Return if failed
@@ -78,7 +78,10 @@ void Ui::addRectTexture(const std::string texture, const sf::Vector2f pos, const
 
 	sf::RectangleShape* newRect = new sf::RectangleShape(size);
 	newRect->setPosition(pos);
+	newRect->setRotation(rotation);
 	newRect->setTexture(m_textures[texture]);
+	if (center)
+		newRect->setOrigin(size.x / 2, size.y / 2);
 	m_rectList.push_back(newRect);
 }
 
