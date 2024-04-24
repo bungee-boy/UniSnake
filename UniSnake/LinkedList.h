@@ -12,6 +12,9 @@ public:
 	~LinkedList() {  // Default deconstructor
 		clear();
 	};
+	int size() {  // Get size (length) of list
+		return m_size;
+	}
 	ListNode<T>* getHead() {  // Get head ptr
 		return m_head; 
 	};
@@ -28,11 +31,13 @@ public:
 			m_head->prev = newNode;  // Point head to new (N <- H)
 			m_head = newNode;  // Set head to new
 		}
+		m_size++;  // Increase size
 	};
 	void pop_front() {  // Delete a node from head 
 		if (m_head == nullptr && m_tail != nullptr) {  // If only tail (should never happen!)
 			delete m_tail;  // Fix error
 			m_tail = nullptr;
+			m_size--;  // Decrease size
 			std::cerr << "WARN -> LinkedList::pop_front() Head was nullptr while Tail was not!\n";
 		}
 		else if (m_head != nullptr) {  // If head exists
@@ -41,6 +46,7 @@ public:
 			m_head->prev = nullptr;
 			if (m_head == m_tail)  // If head and tail are same
 				m_tail = nullptr;  // Don't delete but set tail to null
+			m_size--;  // Decrease size
 		}
 		else
 			std::cerr << "WARN -> LinkedList::pop_front() called when list is empty!\n";
@@ -62,11 +68,13 @@ public:
 				m_tail = newNode;  // Set tail to new
 			}
 		}
+		m_size++;  // Increase size
 	}
 	void pop_back() {  // Delete from tail
 		if (m_tail == nullptr && m_head != nullptr) {  // If only head
 			delete m_head;  // Delete head
 			m_head = nullptr;
+			m_size--;  // Decrease size
 		}
 		else if (m_tail != nullptr) {  // If tail exists
 			m_tail = m_tail->prev;  // Remove tail
@@ -74,6 +82,7 @@ public:
 			m_tail->next = nullptr;
 			if (m_tail == m_head)  // If head and tail are same
 				m_tail = nullptr;  // Don't delete but set tail to null
+			m_size--;  // Decrease size
 		}
 		else
 			std::cerr << "WARN -> LinkedList::pop_back() called when list is empty!\n";
@@ -83,8 +92,8 @@ public:
 			pop_back();
 	}
 private:
+	int m_size{ 0 };  // Size of list
 	ListNode<T>* m_head{ nullptr };  // Pointer to head
 	ListNode<T>* m_tail{ nullptr };  // Pointer to tail
-	
 };
 

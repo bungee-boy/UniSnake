@@ -81,6 +81,10 @@ Snake::Snake(const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Ve
 	m_pos = startPos;
 }
 
+int Snake::getScore() {
+	return m_body.size();
+}
+
 void Snake::handleInput(InputActions action, float dataValue) {
 	if (m_waterRect->contains(m_pos)) {  // Limit to only in water
 		switch (action) {
@@ -155,7 +159,8 @@ bool Snake::isColliding(ICollision& other) {
 }
 
 void Snake::collideSnake() {
-	std::cout << "Snake -> collideSnake()\n";
+	//m_isAlive = false;
+	return;
 }
 
 void Snake::collideFruit(int value) {

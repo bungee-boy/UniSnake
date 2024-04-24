@@ -28,7 +28,7 @@ private:
 	};
 	void startMenu();
 	void startGame();
-	void addSnake();
+	void addSnake(const sf::Vector2f pos);
 	void delSnake(Snake* obj);
 	void addFruit();
 	void delFruit(Fruit* obj);
