@@ -69,5 +69,29 @@ void InputManager::update() {
 		for (IInput* interface : m_interfaces)
 				interface->handleInput(action, data);
 	}
+
+	// Player 2
+	action = InputActions::eNone;
+	data = 0.0f;
+	if (m_p2ControllerIndex == -1) {  // P2 Keyboard
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			action = InputActions::eP2Left;
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			action = InputActions::eP2Right;
+	}
+	else {  // P2 Controller
+		data = sf::Joystick::getAxisPosition(m_p2ControllerIndex, sf::Joystick::X);
+		if (data < -DeadZone)
+			action = InputActions::eP2Left;
+		else if (data > DeadZone)
+			action = InputActions::eP2Right;
+		if (action == InputActions::eNone)
+			data = 0.0f;
+	}
+
+	if (action != InputActions::eNone) {  // Update entities
+		for (IInput* interface : m_interfaces)
+			interface->handleInput(action, data);
+	}
 	
 }

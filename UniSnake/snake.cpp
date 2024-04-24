@@ -63,8 +63,21 @@ void Snake::Body::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
-Snake::Snake(const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
+Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
 	setCollisionType(CollisionType::eCircle);
+	switch (playerNum) {  // Set keybinds based on player number
+	case 1:  // Player 1
+		m_leftKeyBind = InputActions::eP1Left;
+		m_rightKeyBind = InputActions::eP1Right;
+		break;
+	case 2:  // Player 2
+		m_leftKeyBind = InputActions::eP2Left;
+		m_rightKeyBind = InputActions::eP2Right;
+		break;
+	default:
+		break;
+	}
+	
 	m_screenSize = screenSize;  // Set screen size
 	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
@@ -86,38 +99,38 @@ int Snake::getScore() {
 }
 
 void Snake::handleInput(InputActions action, float dataValue) {
-	if (m_waterRect->contains(m_pos)) {  // Limit to only in water
-		switch (action) {
-		case InputActions::eP1Left:  // Turn left
+	if (m_waterRect->contains(m_pos) && (action == m_leftKeyBind || action == m_rightKeyBind)) {  // Limit to only in water & if key is meant for this player
+		if (action == m_leftKeyBind) {  // Turn left
 			if (dataValue == 0.0f) {  // Keyboard
 				if (m_dirVel > 0)  // Ignore 
 					m_dirVel = 0;
+
 				if (m_dirVel > -TurnMax)
 					m_dirVel -= TurnSpeed;
 			}
 			else {  // Controller
 				m_dirVel = (TurnMax / 100) * dataValue;
 			}
-			break;
-		case InputActions::eP1Right:  // Turn right
+		}
+		else if (action == m_rightKeyBind) {  // Turn right
 			if (dataValue == 0.0f) {  // Keyboard
 				if (m_dirVel < 0)
 					m_dirVel = 0;
+
 				if (m_dirVel < TurnMax)
 					m_dirVel += TurnSpeed;
 			}
 			else {  // Controller
 				m_dirVel = (TurnMax / 100) * dataValue;
 			}
-			break;
-		default:  // No input
+		}
+		else {  // No input
 			if (m_dirVel >= TurnSmoothing && m_dirVel > 0)
 				m_dirVel -= TurnSmoothing;
 			else if (m_dirVel <= TurnSmoothing && m_dirVel < 0)
 				m_dirVel += TurnSmoothing;
 			else if (m_dirVel != 0)
 				m_dirVel = 0;
-			break;
 		}
 
 		if (m_dirVel != 0) {

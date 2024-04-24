@@ -201,7 +201,7 @@ void Game::startGame() {
 
 void Game::addSnake(const sf::Vector2f pos) {
 	sf::FloatRect tankRect = *m_tank->getRect();
-	Snake* tempSnake = new Snake(pos, m_tank->getRect(), m_screenSize, false, true);
+	Snake* tempSnake = new Snake(m_snakes.size() + 1, pos, m_tank->getRect(), m_screenSize, false, true);
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
