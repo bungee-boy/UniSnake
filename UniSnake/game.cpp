@@ -5,7 +5,7 @@ Game::Game() {
 	sf::ContextSettings settings;  // Setup window settings
 	settings.antialiasingLevel = 8;
 
-	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Snake - D3169324", sf::Style::Default, settings);  // Create window
+	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Water Snakes - D3169324", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
 
 	m_tank = new Tank({ 40, 40, static_cast<float>(m_screenSize.x - 330), static_cast<float>(m_screenSize.y - 60) });
@@ -14,22 +14,68 @@ Game::Game() {
 }
 
 void Game::begin() {
-	std::cout << m_input.setP1Controller(0) << '\n';
+	//std::cout << m_input.setP1Controller(0) << '\n';  // Controller debugging
 	while (m_window->isOpen()) {  // Main loop
-		addSnake();
-		startGame();
+		switch (m_gameState) {
+		case eGameState::eMenu:
+			startMenu();
+			break;
+		case eGameState::eGame:
+			addSnake();
+			startGame();
+			break;
+		}
+	}
+}
+
+void Game::startMenu() {
+	m_ui.clearAll();
+
+	sf::Text* tempRect = m_ui.addText("Water Snakes", "title", { m_screenCenter.x, 40 }, true, 50, sf::Text::Underlined);
+	m_ui.addLineX({ tempRect->getGlobalBounds().left - 10, tempRect->getGlobalBounds().top + 
+		tempRect->getGlobalBounds().height + 6}, tempRect->getGlobalBounds().width + 20, {200, 200, 200, 255});
+	sf::Text* startGameTxt = m_ui.addText("Start Game", "title", { m_screenCenter.x, m_screenCenter.y - 60 }, true, 40);
+	sf::Text* quitGameTxt =  m_ui.addText("Quit", "title", {m_screenCenter.x, m_screenCenter.y + 60}, true, 40);
+
+	eMainMenu menuOption{ eMainMenu::eNone };
+	sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition());
+	while (m_window->isOpen() && m_gameState == eGameState::eMenu) {
+		sf::Event event;  // Fetch & process window events
+		while (m_window->pollEvent(event)) {
+			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+				m_window->close();  // Quit if window closed or Esc pressed
+			else if (event.type == sf::Event::MouseMoved) {
+				if (startGameTxt->getGlobalBounds().contains({ static_cast<float>(event.mouseMove.x), static_cast<float>(event.mouseMove.y) })) {
+					menuOption = eMainMenu::eStart;
+					//startGameTxt->setFillColor({ 100, 100, 100, 255 });
+					startGameTxt->setStyle(sf::Text::Bold);
+					startGameTxt->setPosition({ m_screenCenter.x - startGameTxt->getGlobalBounds().width / 2, m_screenCenter.y - 40 });
+				}
+				else {
+					menuOption = eMainMenu::eNone;
+					//startGameTxt->setFillColor({ 255, 255, 255, 255 });
+					startGameTxt->setStyle(sf::Text::Regular);
+					startGameTxt->setPosition({ m_screenCenter.x - startGameTxt->getGlobalBounds().width / 2, m_screenCenter.y - 40 });
+				}
+			}
+		}
+
+		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
+		m_ui.draw(m_window);  // Draw UI
+		m_window->display();  // Show new frame
 	}
 }
 
 void Game::startGame() {
+	m_ui.clearAll();  // Reset UI elements
+
+	m_ui.addText("Score", "basic", { m_screenSizef.x - 125, 0}, true, 30, sf::Text::Underlined);
+	m_ui.addLineY({ m_screenSizef.x - 250, 0 }, m_screenSize.y);
+	m_ui.addRectTexture("snake.png", { m_screenSizef.x - 210, 60 }, { 30, 30 }, 180);
+
 	sf::Clock secondClock;
 	float waterLevel{ 100.0f };
-
-	m_ui.addText("Score", "basic", { static_cast<float>(m_screenSize.x) - 125, 0}, true, 30, sf::Text::Underlined);
-	m_ui.addLineY({ static_cast<float>(m_screenSize.x) - 250, 0 }, m_screenSize.y);
-	m_ui.addRectTexture("snake.png", { static_cast<float>(m_screenSize.x) - 210, 60 }, { 30, 30 }, 180);
-	
-	while (m_window->isOpen() && m_snakes.size() > 0) {
+	while (m_window->isOpen() && m_gameState == eGameState::eGame && m_snakes.size() > 0) {
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
@@ -83,13 +129,14 @@ void Game::startGame() {
 
 			m_ui.update();  // Update UI last
 		}
-		m_ani.update();
+		m_ani.update();  // Run animations independent of game ticks
+
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
-		m_draw.update(m_window);  // Draw new frame
-		m_tank->drawTank(m_window);
-		m_tank->drawWater(m_window);
-		m_ui.draw(m_window);
-		m_window->display();
+		m_draw.update(m_window);  // Draw entities & objects
+		m_tank->drawTank(m_window);  // Draw tank body
+		m_tank->drawWater(m_window);  // Draw tank water
+		m_ui.draw(m_window);  // Draw UI
+		m_window->display();  // Show new frame
 	}
 }
 

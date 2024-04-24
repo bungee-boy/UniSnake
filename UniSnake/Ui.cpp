@@ -7,7 +7,7 @@ const sf::Color Ui::RectOuterCol{ 50, 50, 50, 255 };
 
 bool Ui::loadFont(const std::string fontName) {
 	sf::Font newFont;
-	if (!newFont.loadFromFile(fontName + ".ttf")) {
+	if (!newFont.loadFromFile("fonts\\" + fontName + ".ttf")) {
 		std::cerr << "Ui::loadFont(fontName) -> Failed to load font file! (" + fontName + ".ttf)\n";
 		return false;
 	}
@@ -19,16 +19,16 @@ void Ui::unloadFonts() {
 
 }
 
-sf::FloatRect Ui::addText(const std::string txt, const std::string fontName, const sf::Vector2f pos, const bool center, const unsigned int size, const unsigned int style) {
+sf::Text* Ui::addText(const std::string txt, const std::string fontName, const sf::Vector2f pos, const bool center, const unsigned int size, const unsigned int style) {
 	if (!m_fonts.count(fontName)) {  // If font is not loaded
 		if (!loadFont(fontName))  // Try to load new font
-			return { 0.0f, 0.0f, 0.0f, 0.0f };  // If fails, return
+			return new sf::Text();  // If fails, return
 	}
 	sf::Text* newText = new sf::Text(txt, m_fonts[fontName], size);  // Create text
 	newText->setPosition({ (center) ? pos.x - newText->getGlobalBounds().width / 2 : pos.x, pos.y});  // Set position (with centering)
 	newText->setStyle(style);
 	m_textList.push_back(newText);  // Add text to list (to be drawn)
-	return newText->getGlobalBounds();
+	return newText;
 }
 
 void Ui::clearTexts() {
@@ -45,26 +45,26 @@ sf::FloatRect Ui::addRect(const sf::Vector2f pos, const sf::Vector2f size, const
 	return newRect->getGlobalBounds();
 }
 
-sf::FloatRect Ui::addLineX(const sf::Vector2f startPos, const unsigned int xSize) {
-	return addRect(startPos, { static_cast<float>(xSize), RectWidth }, RectInnerCol, RectOuterCol, -RectBorder);
+sf::FloatRect Ui::addLineX(const sf::Vector2f startPos, const unsigned int xSize, const sf::Color fillColour, const sf::Color outlineColour) {
+	return addRect(startPos, { static_cast<float>(xSize), RectWidth }, fillColour, outlineColour, -RectBorder);
 }
 
-sf::FloatRect Ui::addLineY(const sf::Vector2f startPos, const unsigned int ySize) {
-	return addRect(startPos, { RectWidth, static_cast<float>(ySize) }, RectInnerCol, RectOuterCol, -RectBorder);
+sf::FloatRect Ui::addLineY(const sf::Vector2f startPos, const unsigned int ySize, const sf::Color fillColour, const sf::Color outlineColour) {
+	return addRect(startPos, { RectWidth, static_cast<float>(ySize) }, fillColour, outlineColour, -RectBorder);
 }
 
 void Ui::clearRects() {
 	m_rectList.clear();
 }
 
-bool Ui::loadTexture(const std::string texture) {
+bool Ui::loadTexture(const std::string textureName) {
 	sf::Texture* newTexture = new sf::Texture;
-	if (!newTexture->loadFromFile("textures\\" + texture)) {  // Load texture
-		std::cerr << "Failed to load" << texture << '\n';
+	if (!newTexture->loadFromFile("textures\\" + textureName + ".png")) {  // Load texture
+		std::cerr << "Ui::loadTexture(textureName) -> Failed to load" + textureName + ".png" << '\n';
 		return false;
 	}
 	newTexture->setSmooth(true);
-	m_textures.insert({ texture, newTexture });
+	m_textures.insert({ textureName, newTexture });
 	return true;
 }
 
@@ -72,20 +72,25 @@ void Ui::unloadTextures() {
 
 }
 
-sf::FloatRect Ui::addRectTexture(const std::string texture, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const bool center) {
-	if (!m_textures.count(texture)) {  // If texture is not loaded
-		if (!loadTexture(texture))  // Attempt to load texture
+sf::FloatRect Ui::addRectTexture(const std::string textureName, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const bool center) {
+	if (!m_textures.count(textureName)) {  // If texture is not loaded
+		if (!loadTexture(textureName))  // Attempt to load texture
 			return { 0.0f, 0.0f, 0.0f, 0.0f };  // Return if failed
 	}
 
 	sf::RectangleShape* newRect = new sf::RectangleShape(size);
 	newRect->setPosition(pos);
 	newRect->setRotation(rotation);
-	newRect->setTexture(m_textures[texture]);
+	newRect->setTexture(m_textures[textureName]);
 	if (center)
 		newRect->setOrigin(size.x / 2, size.y / 2);
 	m_rectList.push_back(newRect);
 	return newRect->getGlobalBounds();
+}
+
+void Ui::clearAll() {
+	clearRects();
+	clearTexts();
 }
 
 void Ui::update() {
