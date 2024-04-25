@@ -24,14 +24,10 @@ Fruit::Fruit(unsigned int value, sf::FloatRect* tank, CollisionType collision) {
 }
 
 void Fruit::loadTextures() {
-	if (!Texture[0].loadFromFile("textures\\two.png"))  // Texture 2
-		std::cerr << "Failed to load two.png" << '\n';
-	if (!Texture[1].loadFromFile("textures\\three.png"))  // Texture 3
-		std::cerr << "Failed to load three.png" << '\n';
-	if (!Texture[2].loadFromFile("textures\\four.png"))  // Texture 4
-		std::cerr << "Failed to load four.png" << '\n';
-	if (!Texture[3].loadFromFile("textures\\five.png"))  // Texture 5
-		std::cerr << "Failed to load five.png" << '\n';
+	for (int i{ 2 }; i < 5; i++) {
+		if (!Texture[0].loadFromFile("textures\\fruit_" + std::to_string(i) + ".png"))  // Load textures (2 -> 5)
+			std::cerr << "Failed to load fruit_" << i << ".png" << '\n';
+	}
 }
 
 void Fruit::setPos(const sf::Vector2f newPos) {

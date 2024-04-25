@@ -5,6 +5,7 @@ Game::Game() {
 	sf::ContextSettings settings;  // Setup window settings
 	settings.antialiasingLevel = 8;
 
+	Snake::loadTextures();  // Load snake textures
 	Fruit::loadTextures();  // Load fruit textures
 	m_tank = new Tank({ 40, 40, static_cast<float>(m_screenSize.x - 330), static_cast<float>(m_screenSize.y - 60) });  // Create tank class
 

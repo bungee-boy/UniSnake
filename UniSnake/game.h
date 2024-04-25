@@ -38,7 +38,7 @@ private:
 	const sf::Vector2f m_screenCenter{ static_cast<float>(m_screenSize.x) / 2.0f, static_cast<float>(m_screenSize.y) / 2.0f };  // Screen center
 	unsigned int m_fps{ 120 };  // Frames Per Second (FPS)
 	unsigned int m_tps{ 20 };  // Ticks Per Second (TPS)
-	eGameState m_gameState{ eGameState::eGame };  // Game state
+	eGameState m_gameState{ eGameState::eMenu };  // Game state
 	sf::RenderWindow* m_window;  // Window (screen)
 	sf::Clock m_ticks;  // Game ticks
 	AnimateManager m_ani;  // Animation manager

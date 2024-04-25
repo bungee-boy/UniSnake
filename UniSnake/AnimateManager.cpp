@@ -9,6 +9,7 @@ void AnimateManager::removeInterface(IAnimate* interface) {
 }
 
 void AnimateManager::update() {
-	for (int i{ 0 }; i < m_interfaces.size(); i++)
+	for (int i{ 0 }; i < m_interfaces.size(); i++) {
 		m_interfaces[i]->animate();
+	}
 }

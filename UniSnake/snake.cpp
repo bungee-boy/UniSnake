@@ -7,7 +7,8 @@ const float Snake::TurnSpeed = 3;
 const float Snake::TurnMax = 15;
 const float Snake::TurnSmoothing = 4;
 const unsigned int Snake::Gravity = 10;
-
+const unsigned int Snake::BubbleSpeed = 250;
+sf::Texture Snake::BubbleTexture[10];
 sf::Texture Snake::Body::Texture = sf::Texture();
 
 Snake::Body::Body(sf::Vector2f pos, float direction, Snake* parent) {
@@ -63,6 +64,18 @@ void Snake::Body::draw(sf::RenderWindow* window) {
 	window->draw(m_shape);
 }
 
+void Snake::loadTextures() {
+	if (!Body::Texture.loadFromFile("textures\\snake.png"))  // Load texture
+		std::cerr << "Failed to load snake.png" << '\n';
+	Body::Texture.setSmooth(true);
+
+	for (int i{ 0 }; i <= 10; i++) {
+		if (!BubbleTexture[i].loadFromFile("textures\\bubbles_" + std::to_string(i) + ".png"))  // Load texture
+			std::cerr << "Failed to load bubbles_" << i << ".png" << '\n';
+		BubbleTexture[i].setSmooth(true);
+	}
+}
+
 Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
 	setCollisionType(CollisionType::eCircle);
 	switch (playerNum) {  // Set keybinds based on player number
@@ -82,9 +95,7 @@ Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::Floa
 	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
 	m_bounceWall = bounceOffWalls;  // Set bounce off walls
-	if (!Body::Texture.loadFromFile("textures\\snake.png"))  // Load texture
-		std::cerr << "Failed to load snake.png" << '\n';
-	Body::Texture.setSmooth(true);
+	
 	m_pos = startPos;
 	m_addNodes = length;
 	for (int i{ 0 }; i < length; i++) {  // Fill linked list
@@ -251,6 +262,13 @@ void Snake::draw(sf::RenderWindow* window) {
 	while (currNode != nullptr) {  // Draw each node in linked list (in reverse so head on top)
 		currNode->data.draw(window);
 		currNode = currNode->prev;
+	}
+}
+
+void Snake::animate() {
+	if (m_aniClock.getElapsedTime() >= sf::milliseconds(BubbleSpeed)) {
+		
+		m_aniClock.restart();
 	}
 }
 
