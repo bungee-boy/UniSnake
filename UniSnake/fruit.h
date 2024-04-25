@@ -19,7 +19,7 @@ public:
 	void collideSnake() override;  // From ICollision.h
 	void collideFruit(const int value) override;  // From ICollision.h
 	void update();
-	void animate() override;  // From IAnimate.h
+	void animate(sf::RenderWindow* window) override;  // From IAnimate.h
 	void draw(sf::RenderWindow* window) override;  // From IDraw.h
 private:
 	static sf::Texture Texture[4];

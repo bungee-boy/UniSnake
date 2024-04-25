@@ -186,12 +186,12 @@ void Game::startGame() {
 
 			m_ui.update();  // Update UI last
 		}
-		m_ani.update();  // Run animations independent of game ticks
 
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
 		m_draw.update(m_window);  // Draw entities & objects
 		m_tank->drawTank(m_window);  // Draw tank body
 		m_tank->drawWater(m_window);  // Draw tank water
+		m_ani.update(m_window);  // Draw animations & SFX
 		m_ui.draw(m_window);  // Draw UI
 		m_window->display();  // Show new frame
 	}
@@ -206,6 +206,7 @@ void Game::addSnake(const sf::Vector2f pos) {
 	m_input.addInterface(tempSnake);
 	m_collision.addInterface(tempSnake);
 	m_draw.addInterface(tempSnake);
+	m_ani.addInterface(tempSnake);
 	m_snakes.push_back(tempSnake);
 }
 

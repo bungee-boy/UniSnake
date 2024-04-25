@@ -3,7 +3,7 @@
 
 class IAnimate {
 public:
-	virtual void animate() = 0;  // Proccess all animations (MUST not affect any logic!)
+	virtual void animate(sf::RenderWindow* window) = 0;  // Proccess all animations (MUST not affect any logic!)
 protected:
 	sf::Clock m_aniClock;
 };

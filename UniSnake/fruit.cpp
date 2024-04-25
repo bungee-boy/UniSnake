@@ -82,7 +82,7 @@ void Fruit::update() {
 		setPos({ m_pos.x, m_tank->top });
 }
 
-void Fruit::animate() {
+void Fruit::animate(sf::RenderWindow* window) {
 	if (m_aniClock.getElapsedTime() >= sf::milliseconds(250)) {
 		if (m_aniOffset == -4 || m_aniOffset == 4)
 			m_aniDir = !m_aniDir;

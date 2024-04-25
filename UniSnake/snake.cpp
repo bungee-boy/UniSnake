@@ -1,14 +1,16 @@
 #include "Snake.h"
 
-const float Snake::Pi = 3.14159265359f;
-const float Snake::Size = 10.0f;
-const float Snake::NodeGap = 1.1f;
-const float Snake::TurnSpeed = 3;
-const float Snake::TurnMax = 15;
-const float Snake::TurnSmoothing = 4;
-const unsigned int Snake::Gravity = 10;
-const unsigned int Snake::BubbleSpeed = 250;
-sf::Texture Snake::BubbleTexture[10];
+const float Snake::Pi = 3.14159265359f;  // Used for rotation
+const float Snake::Size = 10.0f;  // Radius of snake's nodes
+const float Snake::NodeGap = 1.1f;  // Separation between nodes (affects speed!)
+const float Snake::TurnSpeed = 3;  // Turning speed
+const float Snake::TurnMax = 15;  // Maximum turning amount
+const float Snake::TurnSmoothing = 4;  // Turning speed back to 0 (not pressing)
+const unsigned int Snake::Gravity = 10;  // Turning speed out of water
+const unsigned int Snake::BubbleSpeed = 125;  // Bubble animation speed (ms)
+
+sf::Texture Snake::BubbleTexture[11];
+sf::RectangleShape Snake::BubbleFrames[11];
 sf::Texture Snake::Body::Texture = sf::Texture();
 
 Snake::Body::Body(sf::Vector2f pos, float direction, Snake* parent) {
@@ -73,6 +75,9 @@ void Snake::loadTextures() {
 		if (!BubbleTexture[i].loadFromFile("textures\\bubbles_" + std::to_string(i) + ".png"))  // Load texture
 			std::cerr << "Failed to load bubbles_" << i << ".png" << '\n';
 		BubbleTexture[i].setSmooth(true);
+		BubbleFrames[i].setSize({ 32, 32 });
+		BubbleFrames[i].setOrigin({ 16, 32 });
+		BubbleFrames[i].setTexture(&BubbleTexture[i]);
 	}
 }
 
@@ -255,6 +260,9 @@ void Snake::update() {
 
 	m_body.push_front(Body(m_pos, m_dir, this));  // Add new node to head
 	m_body.pop_back();  // Remove tail node
+
+	sf::FloatRect tempRect = m_body.getHead()->data.getRect();  // Update animation position
+	m_bubblePos = { tempRect.left + tempRect.width / 2, tempRect.top };
 }
 
 void Snake::draw(sf::RenderWindow* window) {
@@ -265,11 +273,15 @@ void Snake::draw(sf::RenderWindow* window) {
 	}
 }
 
-void Snake::animate() {
+void Snake::animate(sf::RenderWindow* window) {
 	if (m_aniClock.getElapsedTime() >= sf::milliseconds(BubbleSpeed)) {
-		
+		m_bubbleFrame++;
+		if (m_bubbleFrame > 10)
+			m_bubbleFrame = 0;
 		m_aniClock.restart();
 	}
+	BubbleFrames[m_bubbleFrame].setPosition(m_bubblePos);
+	window->draw(BubbleFrames[m_bubbleFrame]);
 }
 
 void Snake::gravity() {
