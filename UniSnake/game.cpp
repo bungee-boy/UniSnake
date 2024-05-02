@@ -123,10 +123,12 @@ void Game::startGame() {
 	m_ui.addLineY({ m_screenSizef.x - 250, 0 }, m_screenSize.y);
 
 	for (int i{ 0 }; i < MaxSnakes; i++) {  // Make sure all entities are dead so we only revive the ones we need
-		m_snakes[i]->m_isAlive = false;
+		if (m_snakes[i]->m_isAlive)
+			killSnake(m_snakes[i]);
 	}
 	for (int i{ 0 }; i < MaxFruits; i++) {
-		m_fruits[i]->m_isAlive = false;
+		if (m_fruits[i]->m_isAlive)
+			killFruit(m_fruits[i]);
 	}
 	m_snakeAmount = 0;
 	m_fruitAmount = 0;
@@ -181,6 +183,7 @@ void Game::startGame() {
 				for (int i{ 0 }; i < MaxFruits; i++) {  // Reset the first fruit that is dead
 					if (!m_fruits[i]->m_isAlive) {
 						resetFruit(i);
+						break;
 					}
 				}
 			}
@@ -191,6 +194,8 @@ void Game::startGame() {
 			for (int i{ 0 }; i < MaxFruits; i++) {  // Update fruit
 				if (m_fruits[i]->m_isAlive)
 					m_fruits[i]->update();
+				else if (m_fruits[i]->m_isRegistered)  // Not alive but registered
+					killFruit(m_fruits[i]);
 			}
 
 			for (int i{ 0 }; i < MaxSnakes; i++) {  // Update snakes
@@ -228,10 +233,16 @@ void Game::resetSnake(const unsigned int index, const sf::Vector2f pos) {
 	m_draw.addInterface(m_snakes[index]);
 	m_ani.addInterface(m_snakes[index]);
 	m_snakeAmount++;
+	m_snakes[index]->m_isRegistered = true;
 }
 
 void Game::killSnake(Snake* obj) {
+	m_input.removeInterface(obj);
+	m_collision.removeInterface(obj);
+	m_draw.removeInterface(obj);
+	m_ani.removeInterface(obj);
 	m_snakeAmount--;
+	obj->m_isRegistered = false;
 }
 
 void Game::resetFruit(const unsigned int index) {
@@ -240,10 +251,17 @@ void Game::resetFruit(const unsigned int index) {
 	m_draw.addInterface(m_fruits[index]);
 	m_ani.addInterface(m_fruits[index]);
 	m_fruitAmount++;
+	std::cout << "Reset fruit\n";
+	m_fruits[index]->m_isRegistered = true;
 }
 
 void Game::killFruit(Fruit* obj) {
+	m_collision.removeInterface(obj);
+	m_draw.removeInterface(obj);
+	m_ani.removeInterface(obj);
 	m_fruitAmount--;
+	std::cout << "Kill fruit\n";
+	obj->m_isRegistered = false;
 }
 
 unsigned int Game::weightedRand(const std::vector<unsigned int> probabilities) {

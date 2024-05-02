@@ -8,7 +8,8 @@
 
 class Snake : public IInput, public ICollision, public IDraw, public IAnimate {
 public:
-	bool m_isAlive{ true };
+	bool m_isAlive{ false };
+	bool m_isRegistered{ false };
 	static void loadTextures();  // Load textures
 	Snake();
 	Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);  // Constructor

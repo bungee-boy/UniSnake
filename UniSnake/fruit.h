@@ -7,7 +7,8 @@
 class Fruit : public ICollision, public IDraw, public IAnimate {
 public:
 	static const std::vector<unsigned int> Probabilities;
-	bool m_isAlive{ true };
+	bool m_isAlive{ false };
+	bool m_isRegistered{ false };
 	Fruit();
 	Fruit(unsigned int value, sf::FloatRect* tank, CollisionType collision = CollisionType::eRect);
 	void init(unsigned int value, sf::FloatRect* tank, CollisionType collision = CollisionType::eRect);

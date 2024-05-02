@@ -10,7 +10,6 @@ enum class InputActions {
 
 class IInput {
 public:
-	bool m_isAlive{ true };
 	virtual void handleInput(InputActions action, float dataValue = 0.0f) = 0;
 };
 

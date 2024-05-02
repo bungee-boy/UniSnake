@@ -94,6 +94,7 @@ Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::Floa
 
 void Snake::init(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {
 	m_isAlive = true;
+	m_isRegistered = false;
 	switch (playerNum) {  // Set keybinds based on player number
 	case 1:  // Player 1
 		m_leftKeyBind = InputActions::eP1Left;

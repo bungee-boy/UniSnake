@@ -8,7 +8,6 @@ enum class CollisionType {
 
 class ICollision {
 public:
-	bool m_isAlive{ true };
 	CollisionType getCollisionType() { return m_collisionType; };
 	void setCollisionType(CollisionType type) { m_collisionType = type; };
 	virtual sf::Vector2f getCircleCenter() = 0;
