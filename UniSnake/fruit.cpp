@@ -3,7 +3,16 @@
 const std::vector<unsigned int> Fruit::Probabilities{ 4, 3, 2, 1 };  // Probabilities of values
 sf::Texture Fruit::Texture[4]{ sf::Texture(), sf::Texture(), sf::Texture(), sf::Texture() };
 
+Fruit::Fruit() {
+
+}
+
 Fruit::Fruit(unsigned int value, sf::FloatRect* tank, CollisionType collision) {
+	init(value, tank, collision);
+}
+
+void Fruit::init(unsigned int value, sf::FloatRect* tank, CollisionType collision) {
+	m_isAlive = true;
 	setCollisionType(collision);
 	m_tank = tank;
 	m_value = value;
@@ -12,13 +21,13 @@ Fruit::Fruit(unsigned int value, sf::FloatRect* tank, CollisionType collision) {
 	else
 		std::cerr << "Fruit value is out of range 2 - 5 ! (m_value: " << m_value << ")\n";
 
-	m_pos.x = (rand() % static_cast<int>((m_tank->width - m_sprite.getLocalBounds().width))) + m_tank->left;  // Bound to width + offset
-	m_pos.y = (rand() % static_cast<int>((m_tank->height - m_sprite.getLocalBounds().height))) + m_tank->top;  // Bound to height + offset
+	m_pos.x = (rand() % static_cast<int>((m_tank->width - m_sprite.getGlobalBounds().width))) + m_tank->left;  // Bound to width + offset
+	m_pos.y = (rand() % static_cast<int>((m_tank->height - m_sprite.getGlobalBounds().height))) + m_tank->top;  // Bound to height + offset
 
 	if (getCollisionType() == CollisionType::eCircle) {  // Center circle if fruit is round
-		m_pos.x += m_sprite.getLocalBounds().width / 2;  // Offset position to visually stay
-		m_pos.y += m_sprite.getLocalBounds().height / 2;
-		m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2, m_sprite.getLocalBounds().height / 2);
+		m_pos.x += m_sprite.getGlobalBounds().width / 2;  // Offset position to visually stay
+		m_pos.y += m_sprite.getGlobalBounds().height / 2;
+		m_sprite.setOrigin(m_sprite.getGlobalBounds().width / 2, m_sprite.getGlobalBounds().height / 2);
 	}
 	m_sprite.setPosition(m_pos);
 }
@@ -78,8 +87,10 @@ void Fruit::collideFruit(const int value) {
 }
 
 void Fruit::update() {
-	if (m_pos.y < m_tank->top)  // Move fruit down with water
-		setPos({ m_pos.x, m_tank->top });
+	if (m_tank != nullptr) {
+		if (m_pos.y < m_tank->top)  // Move fruit down with water
+			setPos({ m_pos.x, m_tank->top });
+	}
 }
 
 void Fruit::animate(sf::RenderWindow* window) {

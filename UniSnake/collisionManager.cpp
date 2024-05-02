@@ -20,6 +20,11 @@ void CollisionManager::checkCollision(ICollision& current, ICollision& other) {
 }
 
 void CollisionManager::update() {
+	for (int i{ 0 }; i < m_interfaces.size(); i++) {
+		if (!m_interfaces[i]->m_isAlive)  // If interface is dead
+			m_interfaces.erase(m_interfaces.begin() + i);  // Remove interface
+	}
+
 	for (int current{ 0 }; current < m_interfaces.size(); current++) {
 		for (int other{ 0 }; other < m_interfaces.size(); other++) {
 			if (current != other)

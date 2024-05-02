@@ -10,6 +10,11 @@ void AnimateManager::removeInterface(IAnimate* interface) {
 
 void AnimateManager::update(sf::RenderWindow* window) {
 	for (int i{ 0 }; i < m_interfaces.size(); i++) {
+		if (!m_interfaces[i]->m_isAlive)  // If interface is dead
+			m_interfaces.erase(m_interfaces.begin() + i);  // Remove interface
+	}
+
+	for (int i{ 0 }; i < m_interfaces.size(); i++) {
 		m_interfaces[i]->animate(window);
 	}
 }

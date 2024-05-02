@@ -1,5 +1,8 @@
 #include "Game.h"
 
+const unsigned int Game::MaxSnakes = 2;  // Maximum amount of players
+const unsigned int Game::MaxFruits = 5;  // Maximum amount of fruit
+
 Game::Game() {
 	srand(static_cast<unsigned int>(time(NULL)));
 	sf::ContextSettings settings;  // Setup window settings
@@ -8,6 +11,12 @@ Game::Game() {
 	Snake::loadTextures();  // Load snake textures
 	Fruit::loadTextures();  // Load fruit textures
 	m_tank = new Tank({ 40, 40, static_cast<float>(m_screenSize.x - 330), static_cast<float>(m_screenSize.y - 60) });  // Create tank class
+	for (int i{ 0 }; i < MaxSnakes; i++) {
+		m_snakes[i] = new Snake();
+	}
+	for (int i{ 0 }; i < MaxFruits; i++) {
+		m_fruits[i] = new Fruit();
+	}
 
 	m_window = new sf::RenderWindow(sf::VideoMode(m_screenSize.x, m_screenSize.y), "Water Snakes - D3169324", sf::Style::Default, settings);  // Create window
 	m_window->setFramerateLimit(m_fps);  // Set target framerate
@@ -31,7 +40,7 @@ void Game::startMenu() {
 	m_ui.clearAll();  // Reset UI text & geometry
 	sf::Text* tempRect = m_ui.addText("Water Snakes", "title", { m_screenCenter.x, 40 }, true, 50, sf::Text::Underlined);  // Setup UI text & geometry
 	m_ui.addLineX({ tempRect->getGlobalBounds().left - 10, tempRect->getGlobalBounds().top + 
-		tempRect->getGlobalBounds().height + 6}, tempRect->getGlobalBounds().width + 20, {200, 200, 200, 255});
+		tempRect->getGlobalBounds().height + 6}, static_cast<unsigned int>(tempRect->getGlobalBounds().width + 20), {200, 200, 200, 255});
 	sf::Text* startGameTxt = m_ui.addText("Start Game", "title", { m_screenCenter.x, m_screenCenter.y - 60 }, true, 40);
 	sf::Text* quitGameTxt =  m_ui.addText("Quit", "title", {m_screenCenter.x, m_screenCenter.y + 60}, true, 40);
 
@@ -110,18 +119,27 @@ void Game::startMenu() {
 
 void Game::startGame() {
 	m_ui.clearAll();  // Reset UI elements
-	m_ui.addText("Score", "basic", { m_screenSizef.x - 125, 0}, true, 30, sf::Text::Underlined);  // Setup UI text & geometry
+	m_ui.addText("Score", "basic", { m_screenSizef.x - 125, 0 }, true, 30, sf::Text::Underlined);  // Setup UI text & geometry
 	m_ui.addLineY({ m_screenSizef.x - 250, 0 }, m_screenSize.y);
 
-	addSnake({ 100, 100 });  // Spawn snakes *TEMPORARY*
-	addSnake({ 150, 150 });
+	for (int i{ 0 }; i < MaxSnakes; i++) {  // Make sure all entities are dead so we only revive the ones we need
+		m_snakes[i]->m_isAlive = false;
+	}
+	for (int i{ 0 }; i < MaxFruits; i++) {
+		m_fruits[i]->m_isAlive = false;
+	}
+	m_snakeAmount = 0;
+	m_fruitAmount = 0;
+
+	resetSnake(0, { 100, 100 });  // Spawn snakes *TEMPORARY*
+	resetSnake(1, { 150, 150 });
 
 	std::vector<sf::Text*> scores;  // Create a vector of scores (text)
 	float tempStartY = 70;  // Starting Y position of scores
 	float tempSpacing = 50;  // Spacing between scores
 	float tempIconX = m_screenSizef.x - 210;  // X position of snake icon
 	float tempTextX = m_screenSizef.x - 180;  // X position of snake score
-	for (int i{ 0 }; i < m_snakes.size(); i++) {
+	for (int i{ 0 }; i < MaxSnakes; i++) {
 		m_ui.addRectTexture("snake", { tempIconX, static_cast<float>(tempStartY + (tempSpacing * i)) }, {30, 30}, 180);  // Load texture icon for snake
 		scores.push_back(m_ui.addText(std::to_string(m_snakes[i]->getScore()) , "basic", { tempTextX, static_cast<float>(tempStartY + (tempSpacing * i)) - 15 }, false));  // Text is not centred so -(size/2) to make it line up
 	}
@@ -129,7 +147,7 @@ void Game::startGame() {
 	sf::Clock secondClock;  // Create clock to track seconds
 	float waterLevel{ 100.0f };
 	m_tank->setWaterLevel(waterLevel);  // Make sure to reset tank (from last game cycle)
-	while (m_window->isOpen() && m_gameState == eGameState::eGame && m_snakes.size() > 0) {
+	while (m_window->isOpen() && m_gameState == eGameState::eGame && m_snakeAmount > 0) {
 		sf::Event event;  // Fetch & process window events
 		while (m_window->pollEvent(event)) {
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
@@ -152,36 +170,39 @@ void Game::startGame() {
 		//	waterLevel -= 0.5f;
 		//	if (waterLevel < 10.0f)
 		//		waterLevel = 100.0f;
-		//	//std::cout << waterLevel << '\n';
+		//    //std::cout << waterLevel << '\n';
 		//	m_tank->setWaterLevel(waterLevel);
 		//	secondClock.restart();
 		//}
 
 		if (m_ticks.getElapsedTime() >= sf::seconds(1.0f / m_tps)) {  // Keep update rate independent to FPS
 			m_ticks.restart();
-			if (m_fruits.size() < 5 && rand() % 80 == 0 || m_fruits.size() == 0)  // Ramdomly spawn fruit (min 1, max 5)
-				addFruit();
+			if ((m_fruitAmount < 5 && rand() % 80 == 0) || m_fruitAmount <= 1) {  // Ramdomly spawn fruit (min 1, max 5)
+				for (int i{ 0 }; i < MaxFruits; i++) {  // Reset the first fruit that is dead
+					if (!m_fruits[i]->m_isAlive) {
+						resetFruit(i);
+					}
+				}
+			}
+			std::cout << m_fruitAmount << '\n';
 
 			m_input.update();  // Check input keys
 
-			for (int i{ 0 }; i < m_fruits.size(); i++) {  // Update fruit
-				m_fruits[i]->update();
+			for (int i{ 0 }; i < MaxFruits; i++) {  // Update fruit
+				if (m_fruits[i]->m_isAlive)
+					m_fruits[i]->update();
 			}
-			for (int i{ 0 }; i < m_snakes.size(); i++)  // Update snakes
-				m_snakes[i]->update();
+
+			for (int i{ 0 }; i < MaxSnakes; i++) {  // Update snakes
+				if (m_snakes[i]->m_isAlive)
+					m_snakes[i]->update();
+			}
 
 			m_collision.update();  // Run collision between entities
 
-			for (int i{ 0 }; i < m_snakes.size(); i++) {  // Check if any snakes have died & update scores
-				if (std::to_string(m_snakes[i]->getScore()) != scores[i]->getString())  // If score has changed
+			for (int i{ 0 }; i < MaxSnakes; i++) {  // Check if any snakes have died & update scores
+				if (m_snakes[i]->m_isAlive && std::to_string(m_snakes[i]->getScore()) != scores[i]->getString())  // If alive & score has changed
 					scores[i]->setString(std::to_string(m_snakes[i]->getScore()));  // Update UI text
-
-				if (!m_snakes[i]->m_isAlive)  // If snake is dead
-					delSnake(m_snakes[i]);  // Remove snake
-			}
-			for (int i{ 0 }; i < m_fruits.size(); i++) {  // Check if any fruit have died
-				if (!m_fruits[i]->m_isAlive)
-					delFruit(m_fruits[i]);
 			}
 
 			m_ui.update();  // Update UI last
@@ -200,37 +221,29 @@ void Game::startGame() {
 	return;  // Return to Game::begin(), which will run menu
 }
 
-void Game::addSnake(const sf::Vector2f pos) {
-	sf::FloatRect tankRect = *m_tank->getRect();
-	Snake* tempSnake = new Snake(m_snakes.size() + 1, pos, m_tank->getRect(), m_screenSize, false, true);
-	m_input.addInterface(tempSnake);
-	m_collision.addInterface(tempSnake);
-	m_draw.addInterface(tempSnake);
-	m_ani.addInterface(tempSnake);
-	m_snakes.push_back(tempSnake);
+void Game::resetSnake(const unsigned int index, const sf::Vector2f pos) {
+	m_snakes[index]->init(static_cast<unsigned int>(m_snakeAmount + 1), pos, m_tank->getRect(), m_screenSize, false, true);
+	m_input.addInterface(m_snakes[index]);
+	m_collision.addInterface(m_snakes[index]);
+	m_draw.addInterface(m_snakes[index]);
+	m_ani.addInterface(m_snakes[index]);
+	m_snakeAmount++;
 }
 
-void Game::delSnake(Snake* obj) {
-	m_input.removeInterface(obj);
-	m_collision.removeInterface(obj);
-	m_draw.removeInterface(obj);
-	m_snakes.erase(std::find(m_snakes.begin(), m_snakes.end(), obj));
-	delete obj;
+void Game::killSnake(Snake* obj) {
+	m_snakeAmount--;
 }
 
-void Game::addFruit() {
-	Fruit* tempFruit = new Fruit(weightedRand(Fruit::Probabilities) + 2, m_tank->getRect(), CollisionType::eCircle);
-	m_collision.addInterface(tempFruit);
-	m_draw.addInterface(tempFruit);
-	m_ani.addInterface(tempFruit);
-	m_fruits.push_back(tempFruit);
+void Game::resetFruit(const unsigned int index) {
+	m_fruits[index]->init(weightedRand(Fruit::Probabilities) + 2, m_tank->getRect(), CollisionType::eCircle);
+	m_collision.addInterface(m_fruits[index]);
+	m_draw.addInterface(m_fruits[index]);
+	m_ani.addInterface(m_fruits[index]);
+	m_fruitAmount++;
 }
 
-void Game::delFruit(Fruit* obj) {
-	m_collision.removeInterface(obj);
-	m_draw.removeInterface(obj);
-	m_ani.removeInterface(obj);
-	m_fruits.erase(std::find(m_fruits.begin(), m_fruits.end(), obj));
+void Game::killFruit(Fruit* obj) {
+	m_fruitAmount--;
 }
 
 unsigned int Game::weightedRand(const std::vector<unsigned int> probabilities) {

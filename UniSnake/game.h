@@ -28,16 +28,20 @@ private:
 	};
 	void startMenu();
 	void startGame();
-	void addSnake(const sf::Vector2f pos);
-	void delSnake(Snake* obj);
-	void addFruit();
-	void delFruit(Fruit* obj);
+	void resetSnake(const unsigned int index, const sf::Vector2f pos);
+	void killSnake(Snake* obj);
+	void resetFruit(const unsigned int index);
+	void killFruit(Fruit* obj);
 	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
+	static const unsigned int MaxSnakes;
+	static const unsigned int MaxFruits;
 	const sf::Vector2u m_screenSize{ 1280, 720 };  // Screen size
 	const sf::Vector2f m_screenSizef{ static_cast<float>(m_screenSize.x), static_cast<float>(m_screenSize.y) };  // Screen size (as float)
 	const sf::Vector2f m_screenCenter{ static_cast<float>(m_screenSize.x) / 2.0f, static_cast<float>(m_screenSize.y) / 2.0f };  // Screen center
 	unsigned int m_fps{ 120 };  // Frames Per Second (FPS)
 	unsigned int m_tps{ 20 };  // Ticks Per Second (TPS)
+	unsigned int m_snakeAmount{ 0 };
+	unsigned int m_fruitAmount{ 0 };
 	eGameState m_gameState{ eGameState::eMenu };  // Game state
 	sf::RenderWindow* m_window;  // Window (screen)
 	sf::Clock m_ticks;  // Game ticks
@@ -47,6 +51,6 @@ private:
 	CollisionManager m_collision;  // Collision manager
 	Ui m_ui;  // User Interface
 	Tank* m_tank;  // Tank
-	std::vector<Snake*> m_snakes;  // Vector of snakes
-	std::vector<Fruit*> m_fruits;  // Vector of foods
+	Snake* m_snakes[2];  // Array of snakes
+	Fruit* m_fruits[5];  // Array of foods
 };

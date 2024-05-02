@@ -8,10 +8,12 @@
 
 class Snake : public IInput, public ICollision, public IDraw, public IAnimate {
 public:
-	static void loadTextures();  // Load textures
 	bool m_isAlive{ true };
-	Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);
-	int getScore();
+	static void loadTextures();  // Load textures
+	Snake();
+	Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);  // Constructor
+	void init(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);  // Set default values
+	int getScore();  // Return score
 	void handleInput(InputActions action, float dataValue = 0) override;  // From IInput.h
 	sf::Vector2f getCircleCenter() override;  // From ICollision.h
 	sf::FloatRect getRect() override;  // From ICollision.h
@@ -19,7 +21,7 @@ public:
 	bool isColliding(ICollision& other) override;  // From ICollision.h
 	void collideSnake() override;  // From ICollision.h
 	void collideFruit(int value) override;  // From ICollision.h
-	void update();
+	void update();  // Update logic
 	void draw(sf::RenderWindow* window) override;  // From IDraw.h
 	void animate(sf::RenderWindow* window) override;  // From IAnimate.h
 private:
@@ -31,6 +33,8 @@ private:
 	static const float TurnSmoothing;
 	static const unsigned int Gravity;
 	static const unsigned int BubbleSpeed;
+	static const unsigned int BreathTime;
+	static const unsigned int BreathDelay;
 	static sf::Texture BubbleTexture[11];  // Array of textures (for bubble animation)
 	static sf::RectangleShape BubbleFrames[11];  // Array of Rects (for bubble animation)
 	InputActions m_leftKeyBind{ InputActions::eNone };  // Left keybind
@@ -39,6 +43,7 @@ private:
 	sf::FloatRect* m_waterRect;  // Screen boundary (tank)
 	sf::Vector2f m_pos{ 0, 0 };  // Position
 	sf::Vector2f m_bubblePos{ 0, 0 };  // Bubble animation position
+	sf::Clock m_breathTimer;  // Bubble timer (decrease score / 1s when > BreathTime)
 	int m_bubbleFrame{ 0 };  // Bubble animation frame
 	bool m_showBubbles{ true };  // If bubbles are active
 	float m_dir{ 0 };  // Direction (rotation)

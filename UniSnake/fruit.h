@@ -8,7 +8,9 @@ class Fruit : public ICollision, public IDraw, public IAnimate {
 public:
 	static const std::vector<unsigned int> Probabilities;
 	bool m_isAlive{ true };
+	Fruit();
 	Fruit(unsigned int value, sf::FloatRect* tank, CollisionType collision = CollisionType::eRect);
+	void init(unsigned int value, sf::FloatRect* tank, CollisionType collision = CollisionType::eRect);
 	static void loadTextures();  // Load textures
 	void setPos(const sf::Vector2f newPos);  // Move the fruit to a new position
 	int getValue();  // Return m_value

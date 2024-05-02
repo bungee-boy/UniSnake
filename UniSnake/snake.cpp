@@ -8,6 +8,8 @@ const float Snake::TurnMax = 15;  // Maximum turning amount
 const float Snake::TurnSmoothing = 4;  // Turning speed back to 0 (not pressing)
 const unsigned int Snake::Gravity = 10;  // Turning speed out of water
 const unsigned int Snake::BubbleSpeed = 125;  // Bubble animation speed (ms)
+const unsigned int Snake::BreathTime = 30;  // Amount of breath in seconds
+const unsigned int Snake::BreathDelay = 5;  // Amount of time before score is depleted
 
 sf::Texture Snake::BubbleTexture[11];
 sf::RectangleShape Snake::BubbleFrames[11];
@@ -81,8 +83,17 @@ void Snake::loadTextures() {
 	}
 }
 
-Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
+Snake::Snake() {
 	setCollisionType(CollisionType::eCircle);
+	m_waterRect = new sf::FloatRect();
+}
+
+Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
+	init(playerNum, startPos, waterRect, screenSize, collideWithSelf, bounceOffWalls, length);
+}
+
+void Snake::init(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {
+	m_isAlive = true;
 	switch (playerNum) {  // Set keybinds based on player number
 	case 1:  // Player 1
 		m_leftKeyBind = InputActions::eP1Left;
@@ -95,12 +106,12 @@ Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::Floa
 	default:
 		break;
 	}
-	
+
 	m_screenSize = screenSize;  // Set screen size
 	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
 	m_bounceWall = bounceOffWalls;  // Set bounce off walls
-	
+
 	m_pos = startPos;
 	m_addNodes = length;
 	for (int i{ 0 }; i < length; i++) {  // Fill linked list
@@ -108,6 +119,8 @@ Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::Floa
 		m_pos.y += Size + NodeGap;
 	}
 	m_pos = startPos;
+
+	m_breathTimer.restart();
 }
 
 int Snake::getScore() {
@@ -224,6 +237,12 @@ void Snake::update() {
 		else
 			m_addNodes = 0;
 	}
+
+	if (m_breathTimer.getElapsedTime() > sf::seconds(BreathTime - BreathDelay)) {  // Show bubbles as breath is about to run out
+		m_showBubbles = true;
+	}
+	else
+		m_showBubbles = false;
 
 	m_pos.x += std::roundf(cos((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Move the head by the velocity
 	m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);

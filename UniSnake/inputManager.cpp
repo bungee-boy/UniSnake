@@ -46,6 +46,11 @@ bool InputManager::setP2Controller(const int& joystickIndex) {
 }
 
 void InputManager::update() {
+	for (int i{ 0 }; i < m_interfaces.size(); i++) {
+		if (!m_interfaces[i]->m_isAlive)  // If interface is dead
+			m_interfaces.erase(m_interfaces.begin() + i);  // Remove interface
+	}
+
 	// Player 1
 	InputActions action = InputActions::eNone;
 	float data = 0.0f;
