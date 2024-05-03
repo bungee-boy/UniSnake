@@ -36,9 +36,10 @@ void Fruit::init(unsigned int value, sf::FloatRect* tank, CollisionType collisio
 
 void Fruit::loadTextures() {
 	for (int i{ 2 }; i <= 5; i++) {
-		std::cout << "Loaded texture " << i << '\n';
-		if (!Fruit::Texture[0].loadFromFile("textures\\fruit_" + std::to_string(i) + ".png"))  // Load textures (2 -> 5)
-			std::cerr << "Failed to load fruit_" << i << ".png" << '\n';
+		if (!Fruit::Texture[i - 2].loadFromFile("textures\\fruit_" + std::to_string(i) + ".png"))  // Load textures (2 -> 5)
+			std::cerr << "Failed to load fruit_" << i << ".png\n";
+		else
+			std::cout << "Loaded fruit_" << i << ".png\n";
 	}
 }
 
@@ -111,8 +112,4 @@ void Fruit::animate(sf::RenderWindow* window) {
 
 void Fruit::draw(sf::RenderWindow* window) {
 	window->draw(m_sprite);
-	sf::RectangleShape rect = sf::RectangleShape({ 10, 10 });
-	rect.setOrigin({ 5, 5 });
-	rect.setPosition(m_pos);
-	window->draw(rect);
 }

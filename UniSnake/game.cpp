@@ -112,6 +112,7 @@ void Game::startMenu() {
 		}
 
 		m_window->clear({ 0, 0, 0, 255 });   // Remove previous frame
+		m_draw.update(m_window);  // Draw entities & objects
 		m_ui.draw(m_window);  // Draw UI
 		m_window->display();  // Show new frame
 	}
@@ -179,7 +180,7 @@ void Game::startGame() {
 
 		if (m_ticks.getElapsedTime() >= sf::seconds(1.0f / m_tps)) {  // Keep update rate independent to FPS
 			m_ticks.restart();
-			if ((m_fruitAmount < 5 && rand() % 80 == 0) || m_fruitAmount <= 1) {  // Ramdomly spawn fruit (min 1, max 5)
+			if ((m_fruitAmount < 5 && rand() % 80 == 0) || m_fruitAmount < 1) {  // Ramdomly spawn fruit (min 1, max 5)
 				for (int i{ 0 }; i < MaxFruits; i++) {  // Reset the first fruit that is dead
 					if (!m_fruits[i]->m_isAlive) {
 						resetFruit(i);
