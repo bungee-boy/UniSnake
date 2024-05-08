@@ -50,9 +50,9 @@ void InputManager::update() {
 	InputActions action = InputActions::eNone;
 	float data = 0.0f;
 	if (m_p1ControllerIndex == -1) {  // P1 Keyboard
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			action = InputActions::eP1Left;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			action = InputActions::eP1Right;
 	}
 	else {  // P1 Controller
@@ -74,9 +74,9 @@ void InputManager::update() {
 	action = InputActions::eNone;
 	data = 0.0f;
 	if (m_p2ControllerIndex == -1) {  // P2 Keyboard
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			action = InputActions::eP2Left;
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			action = InputActions::eP2Right;
 	}
 	else {  // P2 Controller

@@ -43,6 +43,10 @@ void Tank::setWaterLevel(float level) {
 		level = 100;
 		std::cerr << "Error -> Tank::setWaterLevel(level): Water level was out of range! (level > 100)\n";
 	}
+	else if (level < 0) {
+		level = 0;
+		std::cerr << "Error -> Tank::setWaterLevel(level): Water level was out of range! (level < 0)\n";
+	}
 	m_water.setPosition({ m_water.getPosition().x, m_tankLeft.getPosition().y + (m_tankLeft.getSize().y * ((100 - level) / 100))});
 	m_water.setSize({ m_water.getSize().x, m_tankLeft.getSize().y * (level / 100) - TankWidth });
 	if (m_water.getSize().y < 0)

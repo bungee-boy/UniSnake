@@ -72,7 +72,7 @@ void Ui::unloadTextures() {
 
 }
 
-sf::FloatRect Ui::addRectTexture(const std::string textureName, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const bool center) {
+sf::FloatRect Ui::addRectTexture(const std::string textureName, const sf::Vector2f pos, const sf::Vector2f size, const float rotation, const sf::Color colour, const bool center) {
 	if (!m_textures.count(textureName)) {  // If texture is not loaded
 		if (!loadTexture(textureName))  // Attempt to load texture
 			return { 0.0f, 0.0f, 0.0f, 0.0f };  // Return if failed
@@ -82,6 +82,7 @@ sf::FloatRect Ui::addRectTexture(const std::string textureName, const sf::Vector
 	newRect->setPosition(pos);
 	newRect->setRotation(rotation);
 	newRect->setTexture(m_textures[textureName]);
+	newRect->setFillColor(colour);
 	if (center)
 		newRect->setOrigin(size.x / 2, size.y / 2);
 	m_rectList.push_back(newRect);

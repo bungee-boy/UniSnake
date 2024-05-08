@@ -12,9 +12,10 @@ public:
 	bool m_isRegistered{ false };
 	static void loadTextures();  // Load textures
 	Snake();
-	Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);  // Constructor
-	void init(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 2);  // Set default values
+	Snake(const unsigned int playerNum, const sf::Color colour, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 5);  // Constructor
+	void init(const unsigned int playerNum, const sf::Color colour, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length = 5);  // Set default values
 	int getScore();  // Return score
+	int getBreathRemaining();  // Return breath remaining
 	void handleInput(InputActions action, float dataValue = 0) override;  // From IInput.h
 	sf::Vector2f getCircleCenter() override;  // From ICollision.h
 	sf::FloatRect getRect() override;  // From ICollision.h
@@ -38,15 +39,17 @@ private:
 	static const unsigned int BreathDelay;
 	static sf::Texture BubbleTexture[11];  // Array of textures (for bubble animation)
 	static sf::RectangleShape BubbleFrames[11];  // Array of Rects (for bubble animation)
+	sf::Color m_colour{ 255, 255, 255, 255 };
 	InputActions m_leftKeyBind{ InputActions::eNone };  // Left keybind
 	InputActions m_rightKeyBind{ InputActions::eNone };  // Right keybind
 	sf::Vector2u m_screenSize;  // Screen size
 	sf::FloatRect* m_waterRect;  // Screen boundary (tank)
-	sf::Vector2f m_pos{ 0, 0 };  // Position
+	sf::Vector2f m_pos{ 0, 0 };
 	sf::Vector2f m_bubblePos{ 0, 0 };  // Bubble animation position
 	sf::Clock m_breathTimer;  // Bubble timer (decrease score / 1s when > BreathTime)
 	int m_bubbleFrame{ 0 };  // Bubble animation frame
-	bool m_showBubbles{ true };  // If bubbles are active
+	bool m_showBubbles{ false };  // If bubbles are active
+	unsigned int m_decreaseScoreLastSec{ 0 };
 	float m_dir{ 0 };  // Direction (rotation)
 	float m_dirVel{ 0 };  // Direction velocity (rotation velocity)
 	unsigned int m_addNodes{ 0 };  // Buffer of nodes to add
@@ -55,7 +58,7 @@ private:
 
 	class Body : public ICollision {  // Node for linked list
 	public:
-		Body(sf::Vector2f pos, float direction, Snake* parent);
+		Body(const sf::Color colour, sf::Vector2f pos, float direction, Snake* parent);
 		sf::Vector2f getCircleCenter() override;  // From iCollision.h
 		sf::FloatRect getRect() override;  // From iCollision.h
 		float getRadius() override;  // From iCollision.h

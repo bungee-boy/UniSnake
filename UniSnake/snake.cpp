@@ -8,20 +8,21 @@ const float Snake::TurnMax = 15;  // Maximum turning amount
 const float Snake::TurnSmoothing = 4;  // Turning speed back to 0 (not pressing)
 const unsigned int Snake::Gravity = 10;  // Turning speed out of water
 const unsigned int Snake::BubbleSpeed = 125;  // Bubble animation speed (ms)
-const unsigned int Snake::BreathTime = 30;  // Amount of breath in seconds
+const unsigned int Snake::BreathTime = 20;  // Amount of breath in seconds
 const unsigned int Snake::BreathDelay = 5;  // Amount of time before score is depleted
 
 sf::Texture Snake::BubbleTexture[11];
 sf::RectangleShape Snake::BubbleFrames[11];
 sf::Texture Snake::Body::Texture = sf::Texture();
 
-Snake::Body::Body(sf::Vector2f pos, float direction, Snake* parent) {
+Snake::Body::Body(const sf::Color colour,  sf::Vector2f pos, float direction, Snake* parent) {
 	setCollisionType(CollisionType::eCircle);
 	m_parent = parent;
 	m_shape.setRadius(Size);
 	m_shape.setOrigin(Size, Size);
 	m_shape.setRotation(direction - 180);
 	m_shape.setTexture(&Texture);
+	m_shape.setFillColor(colour);
 	m_pos = pos;
 	m_shape.setPosition(m_pos);
 }
@@ -41,6 +42,7 @@ float Snake::Body::getRadius() {
 bool Snake::Body::isColliding(ICollision& other) {
 	switch (other.getCollisionType()) {
 	case CollisionType::eRect:
+		std::cout << "Body rect\n";
 		break;
 	case CollisionType::eCircle: {
 		sf::Vector2f offset = getCircleCenter() - other.getCircleCenter();
@@ -88,11 +90,11 @@ Snake::Snake() {
 	m_waterRect = new sf::FloatRect();
 }
 
-Snake::Snake(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
-	init(playerNum, startPos, waterRect, screenSize, collideWithSelf, bounceOffWalls, length);
+Snake::Snake(const unsigned int playerNum, const sf::Color colour, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {  // Constructor
+	init(playerNum, colour, startPos, waterRect, screenSize, collideWithSelf, bounceOffWalls, length);
 }
 
-void Snake::init(const unsigned int playerNum, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {
+void Snake::init(const unsigned int playerNum, const sf::Color colour, const sf::Vector2f startPos, sf::FloatRect* waterRect, const sf::Vector2u screenSize, const bool collideWithSelf, const bool bounceOffWalls, const int length) {
 	m_isAlive = true;
 	m_isRegistered = false;
 	switch (playerNum) {  // Set keybinds based on player number
@@ -112,13 +114,17 @@ void Snake::init(const unsigned int playerNum, const sf::Vector2f startPos, sf::
 	m_waterRect = waterRect;  // Set screen bounds
 	m_collideSelf = collideWithSelf;  // Set collide with self
 	m_bounceWall = bounceOffWalls;  // Set bounce off walls
+	m_colour = colour;
+	m_dir = 0;  // Reset internal values
+	m_dirVel = 0;
 
+	m_body.clear();  // Clear linked list (in case of game loop)
 	m_pos = startPos;
-	m_addNodes = length;
 	for (int i{ 0 }; i < length; i++) {  // Fill linked list
-		m_body.push_back(Body(m_pos, m_dir, this));
+		m_body.push_back(Body(colour, m_pos, m_dir, this));
 		m_pos.y += Size + NodeGap;
 	}
+	m_addNodes = 0;
 	m_pos = startPos;
 
 	m_breathTimer.restart();
@@ -126,6 +132,14 @@ void Snake::init(const unsigned int playerNum, const sf::Vector2f startPos, sf::
 
 int Snake::getScore() {
 	return m_body.size();
+}
+
+int Snake::getBreathRemaining() {
+	int tempInt = BreathTime - m_breathTimer.getElapsedTime().asSeconds();
+	if (tempInt < 0)
+		return 0;
+	else
+		return tempInt;
 }
 
 void Snake::handleInput(InputActions action, float dataValue) {
@@ -175,14 +189,18 @@ void Snake::handleInput(InputActions action, float dataValue) {
 }
 
 sf::Vector2f Snake::getCircleCenter() { 
-	if (m_body.getHead() == nullptr)
-		throw "Head is nullptr, cannot return center!";
+	if (m_body.getHead() == nullptr) {
+		std::cerr << "Warn: Snake::getCircleCenter() -> m_body == nullptr!\n";
+		return { 0.0f, 0.0f };
+	}
 	return m_body.getHead()->data.getCircleCenter();
 }
 
 sf::FloatRect Snake::getRect() {
-	if (m_body.getHead() == nullptr)
-		throw "Head is nullptr, cannot return rect!";
+	if (m_body.getHead() == nullptr) {
+		std::cerr << "Warn: Snake::getRect() -> m_body == nullptr!\n";
+		return { 0.0f, 0.0f, 0.0f, 0.0f };
+	}
 	return m_body.getHead()->data.getRect();
 }
 
@@ -202,8 +220,7 @@ bool Snake::isColliding(ICollision& other) {
 }
 
 void Snake::collideSnake() {
-	//m_isAlive = false;
-	return;
+	m_isAlive = false;
 }
 
 void Snake::collideFruit(int value) {
@@ -211,13 +228,41 @@ void Snake::collideFruit(int value) {
 }
 
 void Snake::update() {
-	if (m_body.getTail()->data.getCircleCenter().x < 0 || m_body.getTail()->data.getCircleCenter().x > m_screenSize.x ||
-		m_body.getTail()->data.getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
-		m_isAlive = false;  // Mark self for deletion
-		return;  // Stop all updates
+	if (!m_isAlive)
+		return;
+
+	if (m_body.getTail() != nullptr) {
+		if (m_body.getTail()->data.getCircleCenter().x < 0 || m_body.getTail()->data.getCircleCenter().x > m_screenSize.x ||
+			m_body.getTail()->data.getCircleCenter().y > m_screenSize.y) {  // If tail has gone off screen
+			m_isAlive = false;  // Mark self for deletion
+			return;  // Stop all updates
+		}
 	}
-		
-	if (m_collideSelf) {  // Check collision with self
+
+	if (!m_waterRect->contains(m_pos)) {  // If not in water
+		m_showBubbles = false;  // Renew breath
+		m_breathTimer.restart();
+	}
+
+	if (m_breathTimer.getElapsedTime() >= sf::seconds(BreathTime)) {  // Start decreasing score as drowning
+		if (m_decreaseScoreLastSec <= m_breathTimer.getElapsedTime().asMilliseconds()) {
+			m_body.pop_back();
+			m_decreaseScoreLastSec = static_cast<unsigned int>(m_breathTimer.getElapsedTime().asMilliseconds() + 250);
+			if (m_body.size() <= 1) {  // If snake has no segments
+				m_isAlive = false;  // Die
+				return;
+			}
+			//std::cout << "Decrease score.\n";
+		}
+
+	}
+	else if (m_breathTimer.getElapsedTime() >= sf::seconds(BreathTime - BreathDelay)) {  // Warning that breath is about to run out
+		m_showBubbles = true;
+		//std::cout << "Show warning\n";
+	}
+	
+
+	if (m_collideSelf && m_body.size() > 1) {  // Check collision with self
 		ListNode<Body>* currNode = m_body.getHead()->next;  // start at head + 1
 		if (currNode != nullptr)
 			currNode = currNode->next;
@@ -232,18 +277,12 @@ void Snake::update() {
 
 	if (m_addNodes > 0) {  // Allow snake to grow
 		if (m_body.getHead() != nullptr) {  // Can only grow if there is an existing node
-			m_body.push_back(Body(m_body.getHead()->data.m_pos, m_body.getHead()->data.m_shape.getRotation(), this));
+			m_body.push_back(Body(m_colour, m_body.getHead()->data.m_pos, m_body.getHead()->data.m_shape.getRotation(), this));
 			m_addNodes--;
 		}
 		else
 			m_addNodes = 0;
 	}
-
-	if (m_breathTimer.getElapsedTime() > sf::seconds(BreathTime - BreathDelay)) {  // Show bubbles as breath is about to run out
-		m_showBubbles = true;
-	}
-	else
-		m_showBubbles = false;
 
 	m_pos.x += std::roundf(cos((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);  // Move the head by the velocity
 	m_pos.y -= std::roundf(sin((-m_dir + 90) * (Pi / 180)) * Size * NodeGap);
@@ -266,9 +305,9 @@ void Snake::update() {
 			gravity();
 	}
 
-	if (m_pos.y < m_waterRect->top + Size) {  // Top
+	if (m_pos.y < m_waterRect->top + Size)  // Top
 		gravity();
-	}
+
 	else if (m_pos.y > m_waterRect->top + m_waterRect->height - Size) {  // Bottom
 		if (m_bounceWall) {
 			m_pos.y = m_waterRect->top + m_waterRect->height - Size;  // Snap back to inside the wall
@@ -278,11 +317,15 @@ void Snake::update() {
 			gravity();
 	}
 
-	m_body.push_front(Body(m_pos, m_dir, this));  // Add new node to head
+	m_body.push_front(Body(m_colour, m_pos, m_dir, this));  // Add new node to head
 	m_body.pop_back();  // Remove tail node
 
-	sf::FloatRect tempRect = m_body.getHead()->data.getRect();  // Update animation position
-	m_bubblePos = { tempRect.left + tempRect.width / 2, tempRect.top };
+	if (m_body.getHead() != nullptr) {
+		sf::FloatRect tempRect = m_body.getHead()->data.getRect();  // Update animation position
+		m_bubblePos = { tempRect.left + tempRect.width / 2, tempRect.top };
+	}
+	else
+		m_showBubbles = false;
 }
 
 void Snake::draw(sf::RenderWindow* window) {
@@ -294,14 +337,17 @@ void Snake::draw(sf::RenderWindow* window) {
 }
 
 void Snake::animate(sf::RenderWindow* window) {
-	if (m_aniClock.getElapsedTime() >= sf::milliseconds(BubbleSpeed)) {
-		m_bubbleFrame++;
-		if (m_bubbleFrame > 10)
-			m_bubbleFrame = 0;
-		m_aniClock.restart();
+	if (m_showBubbles) {
+		if (m_aniClock.getElapsedTime() >= sf::milliseconds(BubbleSpeed)) {
+			m_bubbleFrame++;
+			if (m_bubbleFrame > 10)
+				m_bubbleFrame = 0;
+			m_aniClock.restart();
+		}
+		BubbleFrames[m_bubbleFrame].setPosition(m_bubblePos);
+		window->draw(BubbleFrames[m_bubbleFrame]);
 	}
-	BubbleFrames[m_bubbleFrame].setPosition(m_bubblePos);
-	window->draw(BubbleFrames[m_bubbleFrame]);
+	
 }
 
 void Snake::gravity() {

@@ -12,7 +12,7 @@
 
 enum class eGameState {
 	eMenu,
-	eGame
+	eGame,
 };
 
 class Game
@@ -35,6 +35,8 @@ private:
 	unsigned int weightedRand(const std::vector<unsigned int> probabilities);
 	static const unsigned int MaxSnakes;
 	static const unsigned int MaxFruits;
+	static const sf::Color Player1Col;
+	static const sf::Color Player2Col;
 	const sf::Vector2u m_screenSize{ 1280, 720 };  // Screen size
 	const sf::Vector2f m_screenSizef{ static_cast<float>(m_screenSize.x), static_cast<float>(m_screenSize.y) };  // Screen size (as float)
 	const sf::Vector2f m_screenCenter{ static_cast<float>(m_screenSize.x) / 2.0f, static_cast<float>(m_screenSize.y) / 2.0f };  // Screen center

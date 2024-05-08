@@ -24,7 +24,7 @@ public:
 	void clearRects();
 	bool loadTexture(const std::string textureName);
 	void unloadTextures();
-	sf::FloatRect addRectTexture(const std::string textureName, const sf::Vector2f pos, const sf::Vector2f size, const float rotation = 0.0f, const bool center = true);
+	sf::FloatRect addRectTexture(const std::string textureName, const sf::Vector2f pos, const sf::Vector2f size, const float rotation = 0.0f, const sf::Color colour = { 255, 255, 255, 0 }, const bool center = true);
 	void clearAll();
 	void update();
 	void draw(sf::RenderWindow* window);
